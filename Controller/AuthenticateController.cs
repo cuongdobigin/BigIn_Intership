@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Identity.Data;
+
 using Microsoft.AspNetCore.Mvc;
+using webApi.Dto.Request;
 using webApi.Service.Interface;
 
 namespace webApi.Controllers;
@@ -17,6 +18,6 @@ public class AuthenticateController : ControllerBase
     [Route("login")]
     public async Task<IActionResult> Login([FromBody] RegisterRequest registerRequest)
     {
-        return Ok(_authenticationService.Login(registerRequest.Email, registerRequest.Password));
+        return Ok(await _authenticationService.Login(registerRequest.Username, registerRequest.Password));
     }
 }

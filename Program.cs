@@ -2,9 +2,12 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using webApi.configuration;
 using webApi.Infrastructure.Persistence;
 using webApi.Infrastructure.Persistence.Repository;
 using webApi.Infrastructure.Middleware;
+using webApi.Repository;
+using webApi.Service;
 using webApi.Service.Interface;
 
 
@@ -17,7 +20,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = false, // demo thì tắt
+            ValidateIssuer = false, 
             ValidateAudience = false,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
@@ -36,13 +39,22 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection")
     ));
+
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<PasswordService>();
+builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 var app = builder.Build();
-app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+await ApplicationInitConfig.InitializeAsync(app.Services);
+
+
+app.UseMiddleware<ExceptionHandlingMiddleware>(); 
 app.UseHttpsRedirection();
-
 app.UseSwagger();
 app.UseSwaggerUI();
+
+app.UseAuthentication(); 
+app.UseAuthorization();
 
 app.MapControllers();
 

@@ -4,8 +4,6 @@ namespace webApi.Dto.Request;
 
 public class RegisterRequest
 {
-    [Required]
-    [EmailAddress]
-    string username;
-    string password;
+    public string Username { get; set; } 
+    public string Password { get; set; } 
 }

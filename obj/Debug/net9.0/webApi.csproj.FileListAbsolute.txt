@@ -139,3 +139,4 @@ D:\.net_BigIn\webApi\bin\Debug\net9.0\Microsoft.IdentityModel.Protocols.OpenIdCo
 D:\.net_BigIn\webApi\bin\Debug\net9.0\Microsoft.IdentityModel.Tokens.dll
 D:\.net_BigIn\webApi\bin\Debug\net9.0\System.IdentityModel.Tokens.Jwt.dll
 D:\.net_BigIn\webApi\bin\Debug\net9.0\BCrypt.Net-Next.dll
+D:\.net_BigIn\webApi\obj\Debug\net9.0\webApi.sourcelink.json
