@@ -1,9 +1,8 @@
-// Infrastructure/Middleware/ExceptionHandlingMiddleware.cs
 namespace webApi.Infrastructure.Middleware;
 
-using System.Net;
 using System.Text.Json;
 using webApi.Domain.Exceptions;
+using webApi.Dto.Response;
 
 public class ExceptionHandlingMiddleware
 {
@@ -22,32 +21,46 @@ public class ExceptionHandlingMiddleware
     {
         try
         {
-            await _next(context); 
+            await _next(context);
         }
-        catch (AppException ex) 
+        catch (AppException ex)
         {
-            await HandleAsync(context, ex.HttpStatusCode, ex.Code, ex.Message);
+            await HandleAsync(context, ex.HttpStatusCode, ex.Message, ex.Code);
         }
-        catch (Exception ex) // ← bắt lỗi không mong muốn
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Invalid operation");
+            await HandleAsync(context, 400, ex.Message, 1003);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            _logger.LogError(ex, "Not found");
+            await HandleAsync(context, 404, ex.Message, 1004);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger.LogError(ex, "Unauthorized");
+            await HandleAsync(context, 401, ex.Message, 1005);
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogError(ex, "Argument error");
+            await HandleAsync(context, 400, ex.Message, 1006);
+        }
+        catch (Exception ex)
         {
             _logger.LogError(ex, "Unexpected error");
-            await HandleAsync(context, 500, 9999, "Internal server error");
+            await HandleAsync(context, 500, "Internal server error", 9999);
         }
     }
 
     private static async Task HandleAsync(
-        HttpContext context, int httpStatus, int code, string message)
+        HttpContext context, int httpStatus, string message, int code)
     {
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = httpStatus;
 
-        var response = new
-        {
-            code = code,
-            message = message,
-            statusCode = httpStatus,
-            timestamp = DateTime.UtcNow
-        };
+        var response = ApiResponse<object>.Fail(message, code);
 
         await context.Response.WriteAsync(JsonSerializer.Serialize(response));
     }

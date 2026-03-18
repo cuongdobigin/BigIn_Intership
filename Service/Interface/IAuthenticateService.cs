@@ -1,6 +1,8 @@
-﻿namespace webApi.Service.Interface;
+﻿using webApi.Dto.Response;
+
+namespace webApi.Service.Interface;
 
 public interface IAuthenticateService
 {
-    Task<string> Login(string username, string password);
+    Task<LoginResponse> Login(string username, string password);
 }

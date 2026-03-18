@@ -50,8 +50,11 @@ await ApplicationInitConfig.InitializeAsync(app.Services);
 
 app.UseMiddleware<ExceptionHandlingMiddleware>(); 
 app.UseHttpsRedirection();
-app.UseSwagger();
-app.UseSwaggerUI();
+if (app.Environment.IsDevelopment())            
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.UseAuthentication(); 
 app.UseAuthorization();

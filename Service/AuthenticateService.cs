@@ -3,28 +3,20 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using webApi.Domain.Exceptions;
+using webApi.Dto.Response;
 using webApi.Infrastructure.Persistence.Repository;
 using webApi.Service.Interface;
 
 namespace webApi.Service;
 
-public class AuthenticateService : IAuthenticateService
+public class AuthenticateService(IAccountRepository accountRepository,PasswordService passwordService,IConfiguration config) : IAuthenticateService
 {
-    private readonly IAccountRepository _accountRepository;
-    private readonly PasswordService _passwordService;
-    private readonly IConfiguration _config;          
+    private readonly IAccountRepository _accountRepository=accountRepository;
+    private readonly PasswordService _passwordService=passwordService;
+    private readonly IConfiguration _config=config;          
+    
 
-    public AuthenticateService(
-        IAccountRepository accountRepository,
-        PasswordService passwordService,
-        IConfiguration config)                        
-    {
-        _accountRepository = accountRepository;
-        _passwordService = passwordService;
-        _config = config;                            
-    }
-
-    public async Task<string> Login(string username, string password)
+    public async Task<LoginResponse> Login(string username, string password)
     {
         var account = await _accountRepository.FindByUsernameAsync(username);
         if (account is null)
@@ -32,8 +24,9 @@ public class AuthenticateService : IAuthenticateService
 
         if (!_passwordService.VerifyPassword(password, account.password))  
             throw new AppException(ErrorCode.PASSWORD_ERROR);
-
-        return GenerateToken(account.username);
+        LoginResponse loginResponse = new LoginResponse();
+        loginResponse.token=GenerateToken(account.username);
+        return loginResponse;
     }
 
     private string GenerateToken(string username)

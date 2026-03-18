@@ -2,6 +2,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using webApi.Dto.Request;
+using webApi.Dto.Response;
 using webApi.Service.Interface;
 
 namespace webApi.Controllers;
@@ -16,8 +17,9 @@ public class AuthenticateController : ControllerBase
     }
     [HttpPost]
     [Route("login")]
-    public async Task<IActionResult> Login([FromBody] RegisterRequest registerRequest)
+    public async Task<ApiResponse<LoginResponse>> Login([FromBody] LoginRequest loginRequest)
     {
-        return Ok(await _authenticationService.Login(registerRequest.Username, registerRequest.Password));
+        var result= await _authenticationService.Login(loginRequest.Username, loginRequest.Password);
+        return ApiResponse<LoginResponse>.Success(result);
     }
 }
