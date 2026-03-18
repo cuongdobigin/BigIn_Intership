@@ -13,6 +13,6 @@ public class ApiResponse<T>
     public static ApiResponse<T> Fail(string message, int code = 400)
         => new() { IsSuccess = false, Message = message, Code = code };
 
-    public static ApiResponse<object> Success(string message = "Success", int code = 200)
+    public static ApiResponse<T> Success(string message = "Success", int code = 200)
         => new() { IsSuccess = true, Message = message, Code = code };
 }
