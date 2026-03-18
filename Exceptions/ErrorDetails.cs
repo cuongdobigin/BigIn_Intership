@@ -17,7 +17,12 @@ public static class ErrorDetails
         { ErrorCode.ACCOUNT_NOT_FOUND ,new ErrorDetail{ Code = 1004, Message = "Account not found.", HttpStatusCode = 400 } },
         { ErrorCode.PASSWORD_ERROR ,new ErrorDetail{ Code = 1005, Message = "Incorrect password.", HttpStatusCode = 400 } },
         { ErrorCode.SECRETKEY_NOT_FOUND ,new ErrorDetail{ Code = 1006,Message = "SecretKey not found.", HttpStatusCode = 400 } },
-        { ErrorCode.EXPIRESECONDS_NOT_FOUND,new ErrorDetail{ Code = 1007,Message = "ExpireSeconds not found.", HttpStatusCode = 400 } }
+        { ErrorCode.EXPIRESECONDS_NOT_FOUND,new ErrorDetail{ Code = 1007,Message = "ExpireSeconds not found.", HttpStatusCode = 400 } },
+        { ErrorCode.EMAIL_EXISTED ,new ErrorDetail{ Code = 1008,Message = "Email already exists.", HttpStatusCode = 400 } },
+        { ErrorCode.INCORRECT_PASSWORD ,new ErrorDetail{ Code = 1009,Message = "Incorrect Password.", HttpStatusCode = 400 } },
+        { ErrorCode.INCORRECT_EMAIL,new ErrorDetail{ Code = 1010,Message = "Incorrect Email.", HttpStatusCode = 400 } },
+        { ErrorCode.OLD_PASSWORD_ERROR ,new ErrorDetail{ Code = 1011,Message = "The old password is incorrect.", HttpStatusCode = 400 } },
+        {ErrorCode.REFRESH_TOKEN_INVALID ,new ErrorDetail{ Code = 1012,Message = "Refresh token is invalid.", HttpStatusCode = 401 } }
     };
 
     public static ErrorDetail Get(ErrorCode code)
