@@ -17,8 +17,7 @@ public class Discount
     [Column("max_apply")]
     public decimal MaxApply { get; set; }
 
-    [Column("is_active")]
-    public bool IsActive { get; set; }
+    [Column("is_active")] public bool IsActive { get; set; } = true;
 
     [Column("percent")]
     public decimal Percent { get; set; }

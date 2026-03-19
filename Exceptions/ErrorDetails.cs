@@ -22,7 +22,9 @@ public static class ErrorDetails
         { ErrorCode.INCORRECT_PASSWORD ,new ErrorDetail{ Code = 1009,Message = "Incorrect Password.", HttpStatusCode = 400 } },
         { ErrorCode.INCORRECT_EMAIL,new ErrorDetail{ Code = 1010,Message = "Incorrect Email.", HttpStatusCode = 400 } },
         { ErrorCode.OLD_PASSWORD_ERROR ,new ErrorDetail{ Code = 1011,Message = "The old password is incorrect.", HttpStatusCode = 400 } },
-        {ErrorCode.REFRESH_TOKEN_INVALID ,new ErrorDetail{ Code = 1012,Message = "Refresh token is invalid.", HttpStatusCode = 401 } }
+        {ErrorCode.REFRESH_TOKEN_INVALID ,new ErrorDetail{ Code = 1012,Message = "Refresh token is invalid.", HttpStatusCode = 401 } },
+        { ErrorCode.USER_EXISTED ,new ErrorDetail{ Code = 1014,Message = "User exists.", HttpStatusCode = 400 } },
+        {ErrorCode.UNAUTHORIZED,new ErrorDetail{ Code = 1015,Message = "Unauthorized.", HttpStatusCode = 401 } },
     };
 
     public static ErrorDetail Get(ErrorCode code)
