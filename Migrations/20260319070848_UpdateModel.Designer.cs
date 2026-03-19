@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using webApi.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using webApi.Infrastructure.Persistence;
 namespace webApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260319070848_UpdateModel")]
+    partial class UpdateModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -110,11 +113,8 @@ namespace webApi.Migrations
             modelBuilder.Entity("webApi.Domain.Entity.Book", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("Available")
                         .HasColumnType("boolean")
@@ -141,12 +141,7 @@ namespace webApi.Migrations
                     b.Property<int>("TypeBookId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("type_book_Id")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("type_book_Id");
 
                     b.ToTable("Book");
                 });
@@ -154,11 +149,8 @@ namespace webApi.Migrations
             modelBuilder.Entity("webApi.Domain.Entity.DetailOrder", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric")
@@ -168,12 +160,7 @@ namespace webApi.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("quantity");
 
-                    b.Property<int>("order_id")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("order_id");
 
                     b.ToTable("DetailOrder");
                 });
@@ -211,23 +198,15 @@ namespace webApi.Migrations
             modelBuilder.Entity("webApi.Domain.Entity.Image", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Link")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("link");
 
-                    b.Property<int>("book_Id")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("book_Id");
 
                     b.ToTable("Image");
                 });
@@ -235,14 +214,8 @@ namespace webApi.Migrations
             modelBuilder.Entity("webApi.Domain.Entity.Order", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AccountId")
-                        .HasColumnType("integer");
 
                     b.Property<string>("PaymentStatus")
                         .IsRequired()
@@ -261,14 +234,7 @@ namespace webApi.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("tax");
 
-                    b.Property<int?>("discount_id")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("AccountId");
-
-                    b.HasIndex("discount_id");
 
                     b.ToTable("Order");
                 });
@@ -276,14 +242,8 @@ namespace webApi.Migrations
             modelBuilder.Entity("webApi.Domain.Entity.Review", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AccountId")
-                        .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -302,14 +262,7 @@ namespace webApi.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<int>("book_Id")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("AccountId");
-
-                    b.HasIndex("book_Id");
 
                     b.ToTable("review");
                 });
@@ -334,23 +287,14 @@ namespace webApi.Migrations
             modelBuilder.Entity("webApi.Domain.Entity.ShoppingCart", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AccountId")
-                        .HasColumnType("integer");
 
                     b.Property<int>("Amount")
                         .HasColumnType("integer")
                         .HasColumnName("amount");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AccountId")
-                        .IsUnique();
 
                     b.ToTable("ShoppingCart");
                 });
@@ -386,12 +330,6 @@ namespace webApi.Migrations
             modelBuilder.Entity("webApi.Domain.Entity.User", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("AccountId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Address")
@@ -407,9 +345,6 @@ namespace webApi.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AccountId")
-                        .IsUnique();
 
                     b.ToTable("Users");
                 });
@@ -463,7 +398,7 @@ namespace webApi.Migrations
                 {
                     b.HasOne("webApi.Domain.Entity.TypeBook", "TypeBook")
                         .WithMany("Books")
-                        .HasForeignKey("type_book_Id")
+                        .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -474,7 +409,7 @@ namespace webApi.Migrations
                 {
                     b.HasOne("webApi.Domain.Entity.Order", "Order")
                         .WithMany("DetailOrder")
-                        .HasForeignKey("order_id")
+                        .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -485,7 +420,7 @@ namespace webApi.Migrations
                 {
                     b.HasOne("webApi.Domain.Entity.Book", "Book")
                         .WithMany("Images")
-                        .HasForeignKey("book_Id")
+                        .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -496,13 +431,15 @@ namespace webApi.Migrations
                 {
                     b.HasOne("webApi.Domain.Entity.Account", "Account")
                         .WithMany("Orders")
-                        .HasForeignKey("AccountId")
+                        .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("webApi.Domain.Entity.Discount", "Discount")
                         .WithMany("Orders")
-                        .HasForeignKey("discount_id");
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Account");
 
@@ -513,13 +450,13 @@ namespace webApi.Migrations
                 {
                     b.HasOne("webApi.Domain.Entity.Account", "Account")
                         .WithMany("Reviews")
-                        .HasForeignKey("AccountId")
+                        .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("webApi.Domain.Entity.Book", "Book")
                         .WithMany("Reviews")
-                        .HasForeignKey("book_Id")
+                        .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -532,7 +469,7 @@ namespace webApi.Migrations
                 {
                     b.HasOne("webApi.Domain.Entity.Account", "Account")
                         .WithOne("ShoppingCart")
-                        .HasForeignKey("webApi.Domain.Entity.ShoppingCart", "AccountId")
+                        .HasForeignKey("webApi.Domain.Entity.ShoppingCart", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -543,7 +480,9 @@ namespace webApi.Migrations
                 {
                     b.HasOne("webApi.Domain.Entity.Account", "Account")
                         .WithOne("User")
-                        .HasForeignKey("webApi.Domain.Entity.User", "AccountId");
+                        .HasForeignKey("webApi.Domain.Entity.User", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Account");
                 });
@@ -554,7 +493,8 @@ namespace webApi.Migrations
 
                     b.Navigation("Reviews");
 
-                    b.Navigation("ShoppingCart");
+                    b.Navigation("ShoppingCart")
+                        .IsRequired();
 
                     b.Navigation("User");
                 });

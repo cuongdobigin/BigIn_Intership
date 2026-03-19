@@ -25,6 +25,7 @@ public class Book
     public bool Available { get; set; }
     
     public int TypeBookId { get; set; }
+    [Column("is_active")] public bool IsActive { get; set; } = true;
     public TypeBook TypeBook { get; set; } = null!;
 
     public ICollection<Image> Images { get; set; } = new List<Image>();

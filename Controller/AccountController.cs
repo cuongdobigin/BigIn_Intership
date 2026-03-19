@@ -25,4 +25,11 @@ public class AccountController(IAccountService accountService): ControllerBase
         await _accountService.changePassword(request);
         return ApiResponse<string>.Success();
     }
+
+    [HttpDelete("{accountId}")]
+    public async Task<ApiResponse<string>> deleteAccount(int accountId)
+    {
+        await _accountService.deleteAccount(accountId);
+        return ApiResponse<string>.Success();
+    }
 }

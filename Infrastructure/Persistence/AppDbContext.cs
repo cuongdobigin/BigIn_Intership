@@ -27,38 +27,38 @@ public class AppDbContext : DbContext
         {
             entity.HasOne(a => a.User)
                   .WithOne(u => u.Account)
-                  .HasForeignKey<User>(u => u.Id);
+                  .HasForeignKey<User>("AccountId");
 
             entity.HasOne(a => a.ShoppingCart)
                   .WithOne(s => s.Account)
-                  .HasForeignKey<ShoppingCart>(a => a.Id);
+                  .HasForeignKey<ShoppingCart>("AccountId");
 
             entity.HasMany(a => a.Roles)
                   .WithMany(r => r.Accounts)
-                  .UsingEntity(j => j.ToTable("AccountRole")); // ✅ xóa HasData
+                  .UsingEntity(j => j.ToTable("AccountRole"));
 
             entity.HasMany(a => a.Orders)
                   .WithOne(o => o.Account)
-                  .HasForeignKey(a => a.Id);
+                  .HasForeignKey("AccountId");
 
             entity.HasMany(a => a.Reviews)
                   .WithOne(r => r.Account)
-                  .HasForeignKey(a => a.Id);
+                  .HasForeignKey("AccountId");
         });
 
         modelBuilder.Entity<Book>(entity =>
         {
             entity.HasOne(b => b.TypeBook)
                   .WithMany(t => t.Books)
-                  .HasForeignKey(b => b.Id);
+                  .HasForeignKey("type_book_Id");
 
             entity.HasMany(b => b.Images)
                   .WithOne(i => i.Book)
-                  .HasForeignKey(b => b.Id);
+                  .HasForeignKey("book_Id");
 
             entity.HasMany(b => b.Reviews)
                   .WithOne(r => r.Book)
-                  .HasForeignKey(b => b.Id);
+                  .HasForeignKey("book_Id");
 
             entity.HasMany(b => b.ShoppingCarts)
                   .WithMany(s => s.Books)
@@ -69,14 +69,14 @@ public class AppDbContext : DbContext
         {
             entity.HasOne(o => o.Discount)
                   .WithMany(d => d.Orders)
-                  .HasForeignKey(d => d.Id);
+                  .HasForeignKey("discount_id");
         });
 
         modelBuilder.Entity<DetailOrder>(entity =>
         {
             entity.HasOne(do_ => do_.Order)
                   .WithMany(o => o.DetailOrder)
-                  .HasForeignKey(o => o.Id);
+                  .HasForeignKey("order_id");
 
             entity.HasMany(do_ => do_.Books)
                   .WithMany()

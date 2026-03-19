@@ -11,7 +11,8 @@ public class AccountRepository(AppDbContext context) : IAccountRepository
     public async Task<Account> FindByUsernameAsync(string username)
     {
         return await context.Accounts
-            .FirstOrDefaultAsync(a => a.username == username);
+            .Include(account => account.User)
+            .FirstOrDefaultAsync(a => a.username == username) ;
     }
 
     public async Task<Account> AddAsync(Account account)
@@ -26,4 +27,11 @@ public class AccountRepository(AppDbContext context) : IAccountRepository
         context.Accounts.Update(account);
         await context.SaveChangesAsync();
     }
+
+    public async Task<Account> findById(int accountId)
+    {
+        return await context.Accounts.FindAsync(accountId);
+        
+    }
+    
 }

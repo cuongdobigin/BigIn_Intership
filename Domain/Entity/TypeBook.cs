@@ -19,12 +19,6 @@ public class TypeBook
 
     [Column("is_active")]
     public bool IsActive { get; set; }
-
-    [Column("create_at")]
-    public DateTime CreateAt { get; set; }
-
-    [Column("update_at")]
-    public DateTime UpdateAt { get; set; }
     
     public ICollection<Book> Books { get; set; } = new List<Book>();
 }
