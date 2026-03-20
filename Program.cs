@@ -28,6 +28,8 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<ITypeBookService, TypeBookService>();    
+builder.Services.AddScoped<ITypeBookRepository, TypeBookRepository>(); 
 builder.Services.AddAutoMapper(cfg => {}, Assembly.GetExecutingAssembly());
 var app = builder.Build();
 

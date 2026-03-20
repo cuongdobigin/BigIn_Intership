@@ -31,7 +31,7 @@ public class AuthenticateController : ControllerBase
         };
         Response.Cookies.Append("refreshToken", result.RefreshToken, cookieOptions);
 
-        return ApiResponse<LoginResponse>.Success(new LoginResponse { token = result.AccessToken });
+        return ApiResponse<LoginResponse>.Success(new LoginResponse { token = result.AccessToken,isFirstTime = result.isFirstTime});
     }
 
     [HttpPost]

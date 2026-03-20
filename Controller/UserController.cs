@@ -12,12 +12,12 @@ namespace webApi.Controller;
 public class UserController(IUserService userService) : ControllerBase
 {   
     [HttpPost]
-    public async Task<ApiResponse<UserResponse>> createUser ([FromBody]CreateUserRequest request)
+    public async Task<ApiResponse<UserResponse>> createUser ([FromBody]UserRequest request)
     {
         return ApiResponse<UserResponse>.Success(await userService.createUser(request));
     }
     [HttpPut]
-    public async Task<ApiResponse<UserResponse>> updateUser([FromBody]CreateUserRequest request)
+    public async Task<ApiResponse<UserResponse>> updateUser([FromBody]UserRequest request)
     {
         return ApiResponse<UserResponse>.Success(await userService.updateUser(request));
     }

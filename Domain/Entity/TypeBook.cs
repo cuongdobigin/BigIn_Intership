@@ -17,8 +17,7 @@ public class TypeBook
     [Column("description")]
     public string Description { get; set; } = "";
 
-    [Column("is_active")]
-    public bool IsActive { get; set; }
+    [Column("is_active")] public bool IsActive { get; set; } = true;
     
     public ICollection<Book> Books { get; set; } = new List<Book>();
 }

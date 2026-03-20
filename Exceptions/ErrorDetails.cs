@@ -25,6 +25,8 @@ public static class ErrorDetails
         {ErrorCode.REFRESH_TOKEN_INVALID ,new ErrorDetail{ Code = 1012,Message = "Refresh token is invalid.", HttpStatusCode = 401 } },
         { ErrorCode.USER_EXISTED ,new ErrorDetail{ Code = 1014,Message = "User exists.", HttpStatusCode = 400 } },
         {ErrorCode.UNAUTHORIZED,new ErrorDetail{ Code = 1015,Message = "Unauthorized.", HttpStatusCode = 401 } },
+        {ErrorCode.TYPE_BOOK_EXISTED,new ErrorDetail{ Code = 1016,Message = "Type book already exists.", HttpStatusCode = 400 } },
+        { ErrorCode.TYPE_BOOK_NOT_FOUND ,new ErrorDetail{ Code = 1017,Message = "Type book not found.", HttpStatusCode = 400 } },
     };
 
     public static ErrorDetail Get(ErrorCode code)

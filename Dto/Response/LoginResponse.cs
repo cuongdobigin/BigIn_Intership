@@ -3,5 +3,5 @@
 public class LoginResponse
 {
     public string token { get; set; }
-    public Boolean isFirstTime { get; set; }
+    public bool isFirstTime { get; set; }
 }

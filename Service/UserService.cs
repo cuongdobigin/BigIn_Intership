@@ -26,7 +26,7 @@ public class UserService(IUserRepository userRepository,IAccountRepository accou
         return mapper.Map<UserResponse>(user);
     }
 
-    public async Task<UserResponse> createUser(CreateUserRequest request)
+    public async Task<UserResponse> createUser(UserRequest request)
     {
         var username = getUsername() ?? throw new AppException(ErrorCode.UNAUTHORIZED);
         Account account = await accountRepository.FindByUsernameAsync(username)
@@ -49,7 +49,7 @@ public class UserService(IUserRepository userRepository,IAccountRepository accou
             .FindFirstValue(ClaimTypes.Name);
     }
 
-    public async Task<UserResponse> updateUser(CreateUserRequest request)
+    public async Task<UserResponse> updateUser(UserRequest request)
     {
         var user = await userRepository.findByAccount_Username(getUsername())
                    ?? throw new AppException(ErrorCode.USER_NOT_FOUND);

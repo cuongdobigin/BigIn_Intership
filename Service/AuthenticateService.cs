@@ -28,7 +28,8 @@ public class AuthenticateService(IAccountRepository accountRepository,PasswordSe
         return new LoginResult
         {
             AccessToken = GenerateToken(account.username),
-            RefreshToken = GenerateRefreshToken(account.username)
+            RefreshToken = GenerateRefreshToken(account.username),
+            isFirstTime = account.isFirstTime
         };
     }
 

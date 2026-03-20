@@ -17,4 +17,6 @@ public enum ErrorCode
     USER_NOT_FOUND,
     USER_EXISTED,
     UNAUTHORIZED,
+    TYPE_BOOK_EXISTED,
+    TYPE_BOOK_NOT_FOUND
 }
