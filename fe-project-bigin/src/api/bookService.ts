@@ -7,6 +7,11 @@ export interface BookType {
   isActive: boolean
 }
 
+export interface ImageResponse {
+  id: number
+  link: string
+}
+
 export interface Book {
   id: number
   name: string
@@ -14,7 +19,7 @@ export interface Book {
   description: string
   stock: boolean
   author: string
-  avatar: string
+  images: ImageResponse[]
 }
 
 export interface PaginatedResponse<T> {
@@ -50,4 +55,8 @@ export const bookService = {
     console.log('Calling API:', url)
     return axiosClient.get(url)
   },
+  
+  getBookById(id: number): Promise<ApiResponse<Book>> {
+    return axiosClient.get(`/api/books/${id}`)
+  }
 }

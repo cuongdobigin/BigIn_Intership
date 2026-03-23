@@ -1,0 +1,11 @@
+D:\.net_BigIn\MyApp.Domain\bin\Debug\net9.0\MyApp.Domain.deps.json
+D:\.net_BigIn\MyApp.Domain\bin\Debug\net9.0\MyApp.Domain.dll
+D:\.net_BigIn\MyApp.Domain\bin\Debug\net9.0\MyApp.Domain.pdb
+D:\.net_BigIn\MyApp.Domain\obj\Debug\net9.0\MyApp.Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\.net_BigIn\MyApp.Domain\obj\Debug\net9.0\MyApp.Domain.AssemblyInfoInputs.cache
+D:\.net_BigIn\MyApp.Domain\obj\Debug\net9.0\MyApp.Domain.AssemblyInfo.cs
+D:\.net_BigIn\MyApp.Domain\obj\Debug\net9.0\MyApp.Domain.csproj.CoreCompileInputs.cache
+D:\.net_BigIn\MyApp.Domain\obj\Debug\net9.0\MyApp.Domain.dll
+D:\.net_BigIn\MyApp.Domain\obj\Debug\net9.0\refint\MyApp.Domain.dll
+D:\.net_BigIn\MyApp.Domain\obj\Debug\net9.0\MyApp.Domain.pdb
+D:\.net_BigIn\MyApp.Domain\obj\Debug\net9.0\ref\MyApp.Domain.dll

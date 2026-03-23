@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { Book } from '../api/bookService'
 
-defineProps<{
+const props = defineProps<{
   book: Book
 }>()
+
+const avatar = computed(() => props.book.images?.[0]?.link ?? '')
 
 const formatPrice = (price: number) => {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price * 1000)
@@ -12,13 +15,17 @@ const formatPrice = (price: number) => {
 
 <template>
   <div class="book-card">
-    <div class="book-cover">
-      <img :src="book.avatar" :alt="book.name" class="cover-img" />
-    </div>
-    <div class="book-info">
-      <h3 class="book-title" :title="book.name">{{ book.name }}</h3>
-      <p class="book-author">Tác giả: {{ book.author }}</p>
-      <p class="book-desc">{{ book.description }}</p>
+    <router-link :to="`/books/${book.id}`" class="book-link">
+      <div class="book-cover">
+        <img :src="avatar" :alt="book.name" class="cover-img" />
+      </div>
+      <div class="book-info">
+        <h3 class="book-title" :title="book.name">{{ book.name }}</h3>
+        <p class="book-author">Tác giả: {{ book.author }}</p>
+        <p class="book-desc">{{ book.description }}</p>
+      </div>
+    </router-link>
+    <div class="book-info-footer">
       <div class="book-footer">
         <span class="book-price">{{ formatPrice(book.price) }}</span>
         <button class="add-to-cart" :disabled="!book.stock">
@@ -67,12 +74,23 @@ const formatPrice = (price: number) => {
   transform: scale(1.05);
 }
 
-.book-info {
-  padding: 1.25rem;
+.book-link {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
   flex: 1;
+}
+
+.book-info {
+  padding: 1.25rem 1.25rem 0.5rem 1.25rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+.book-info-footer {
+  padding: 0 1.25rem 1.25rem 1.25rem;
 }
 
 .book-title {

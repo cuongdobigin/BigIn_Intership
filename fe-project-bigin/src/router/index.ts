@@ -18,6 +18,12 @@ const router = createRouter({
       component: BooksView,
     },
     {
+      path: '/books/:id',
+      name: 'book-detail',
+      component: () => import('../views/BookDetailView.vue'),
+      props: true
+    },
+    {
       path: '/cart',
       name: 'cart',
       component: () => import('../views/CartView.vue'),
