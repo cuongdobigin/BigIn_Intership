@@ -31,8 +31,8 @@ public class AuthenticateService(IAccountRepository accountRepository,PasswordSe
         
         return new LoginResult
         {
-            AccessToken = GenerateToken(account.username),
-            RefreshToken = GenerateRefreshToken(account.username),
+            AccessToken = await GenerateToken(account.username),
+            RefreshToken = await GenerateRefreshToken(account.username),
             isFirstTime = account.isFirstTime
         };
     }
@@ -59,7 +59,7 @@ public class AuthenticateService(IAccountRepository accountRepository,PasswordSe
             }, out SecurityToken validatedToken);
 
             var username = principal.Identity.Name;
-            return GenerateToken(username);
+            return await GenerateToken(username);
         }
         catch
         {
@@ -67,19 +67,26 @@ public class AuthenticateService(IAccountRepository accountRepository,PasswordSe
         }
     }
 
-    private string GenerateToken(string username)
+    private async Task< string> GenerateToken(string username)
     {
+        var account = await _accountRepository.FindByUsernameAsync(username);
+        
         var key = _config["Jwt:SecretKey"]
                   ?? throw new AppException(ErrorCode.SECRETKEY_NOT_FOUND);
 
         var expireSeconds = int.Parse(_config["Jwt:ExpireSeconds"] 
                                       ?? throw new AppException(ErrorCode.EXPIRESECONDS_NOT_FOUND));
-        var claims = new[]
+        var roleClaims = account.Roles?
+                             .Select(role => new Claim(ClaimTypes.Role, role.Name))
+                         ?? Enumerable.Empty<Claim>();
+
+        var claims = new List<Claim>
         {
             new Claim(ClaimTypes.Name, username),
-            new Claim("TokenType", "accessToken")
+            new Claim("TokenType", "accessToken"),
         };
 
+        claims.AddRange(roleClaims);
         var token = new JwtSecurityToken(
             issuer:"http://localhost:5052",
             audience:"http://localhost:5052",
@@ -93,19 +100,26 @@ public class AuthenticateService(IAccountRepository accountRepository,PasswordSe
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    private string GenerateRefreshToken(string username)
+    private async Task<string> GenerateRefreshToken(string username)
     {
+        var account = await _accountRepository.FindByUsernameAsync(username);
         var key = _config["Jwt:SecretKeyRefresh"]
                   ?? throw new AppException(ErrorCode.SECRETKEY_NOT_FOUND);
 
         var expireSeconds = int.Parse(_config["Jwt:RefreshTokenExpireSeconds"] 
                                       ?? throw new AppException(ErrorCode.EXPIRESECONDS_NOT_FOUND));
         
-        var claims = new[]
+        var roleClaims = account.Roles?
+                             .Select(role => new Claim(ClaimTypes.Role, role.Name))
+                         ?? Enumerable.Empty<Claim>();
+
+        var claims = new List<Claim>
         {
             new Claim(ClaimTypes.Name, username),
-            new Claim("TokenType", "RefreshToken")
+            new Claim("TokenType", "accessToken"),
         };
+
+        claims.AddRange(roleClaims);
 
         var token = new JwtSecurityToken(
             issuer:"http://localhost:5052",

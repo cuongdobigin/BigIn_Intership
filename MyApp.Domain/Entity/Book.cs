@@ -24,9 +24,11 @@ public class Book
     [Column("stock")]
     public bool Stock { get; set; }
     
-    
+    [Column("author")]
     public string Author { get; set; } = "";
     
+    [Column("quantity")]
+    public int quantity {get; set;} = 0;
     
     [Column("is_active")] public bool IsActive { get; set; } = true;
     public TypeBook TypeBook { get; set; } = null!;

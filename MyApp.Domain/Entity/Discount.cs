@@ -1,4 +1,4 @@
-﻿// Discount.cs
+// Discount.cs
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -21,6 +21,12 @@ public class Discount
 
     [Column("percent")]
     public decimal Percent { get; set; }
+
+    [Column("start_date")]
+    public DateTime StartDate { get; set; }
+
+    [Column("end_date")]
+    public DateTime EndDate { get; set; }
     
     public ICollection<Order> Orders { get; set; } = new List<Order>();
 }

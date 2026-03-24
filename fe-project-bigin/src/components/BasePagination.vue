@@ -22,7 +22,7 @@ const changePage = (page: number) => {
       :disabled="!hasPrevious" 
       @click="changePage(currentPage - 1)"
     >
-      Trước
+      &lt;
     </button>
     
     <div class="page-numbers">
@@ -42,7 +42,7 @@ const changePage = (page: number) => {
       :disabled="!hasNext" 
       @click="changePage(currentPage + 1)"
     >
-      Sau
+      &gt;
     </button>
   </div>
 </template>
@@ -87,7 +87,9 @@ const changePage = (page: number) => {
 }
 
 .page-btn {
-  padding: 0.5rem 1.25rem;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  font-size: 1.1rem;
   border: 1px solid var(--border);
   background: white;
   border-radius: var(--radius-md);

@@ -20,6 +20,10 @@ export const reviewService = {
     return axiosClient.post(`/api/reviews/${bookId}`, { message })
   },
 
+  updateReview(id: number, message: string): Promise<ApiResponse<ReviewResponse>> {
+    return axiosClient.put(`/api/reviews/${id}`, { message })
+  },
+
   deleteReview(id: number): Promise<ApiResponse<string>> {
     return axiosClient.delete(`/api/reviews/${id}`)
   }

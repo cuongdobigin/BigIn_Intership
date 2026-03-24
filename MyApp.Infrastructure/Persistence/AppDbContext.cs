@@ -30,9 +30,9 @@ public class AppDbContext : DbContext
                   .WithOne(u => u.Account)
                   .HasForeignKey<User>("AccountId");
 
-            entity.HasOne(a => a.ShoppingCart)
+            entity.HasMany(a => a.ShoppingCart)
                   .WithOne(s => s.Account)
-                  .HasForeignKey<ShoppingCart>("AccountId");
+                  .HasForeignKey("account_Id");
 
             entity.HasMany(a => a.Roles)
                   .WithMany(r => r.Accounts)
@@ -62,8 +62,8 @@ public class AppDbContext : DbContext
                   .HasForeignKey("book_Id");
 
             entity.HasMany(b => b.ShoppingCarts)
-                  .WithMany(s => s.Books)
-                  .UsingEntity(j => j.ToTable("BookShoppingCart"));
+                  .WithOne(s => s.Books)
+                  .HasForeignKey("book_Id");
         });
 
         modelBuilder.Entity<Order>(entity =>

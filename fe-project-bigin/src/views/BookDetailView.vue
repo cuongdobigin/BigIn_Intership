@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { bookService, type Book } from '../api/bookService'
 import { reviewService, type ReviewResponse } from '../api/reviewService'
@@ -31,6 +31,11 @@ const reviewPageSize = 3
 // Review Form
 const newReviewMessage = ref('')
 const submittingReview = ref(false)
+
+// Review Edit
+const editingReviewId = ref<number | null>(null)
+const editReviewMessage = ref('')
+const submittingEdit = ref(false)
 
 const fetchReviews = async (page: number) => {
   try {
@@ -112,6 +117,46 @@ const handleDeleteReview = async (id: number) => {
   }
 }
 
+const handleEditClick = (review: ReviewResponse) => {
+  editingReviewId.value = review.id
+  editReviewMessage.value = review.message
+}
+
+const handleCancelEdit = () => {
+  editingReviewId.value = null
+  editReviewMessage.value = ''
+}
+
+const handleSaveEdit = async (id: number) => {
+  if (!editReviewMessage.value.trim()) return
+
+  submittingEdit.value = true
+  try {
+    const res = await reviewService.updateReview(id, editReviewMessage.value)
+    if (res.isSuccess) {
+      toastStore.show('Đã cập nhật đánh giá!', 'success')
+      const index = reviews.value.findIndex(r => r.id === id)
+      if (index !== -1) {
+        reviews.value[index].message = editReviewMessage.value
+        // Optionally update the updatedAt timestamp if the backend returns it
+        if (res.data && res.data.updatedAt) {
+          reviews.value[index].updatedAt = res.data.updatedAt
+        } else {
+          reviews.value[index].updatedAt = new Date().toISOString()
+        }
+      }
+      handleCancelEdit()
+    } else {
+      toastStore.show(res.message, 'error')
+    }
+  } catch (err: unknown) {
+    const error = err as { response?: { data?: { message?: string } } }
+    toastStore.show(error.response?.data?.message || 'Lỗi khi cập nhật đánh giá.', 'error')
+  } finally {
+    submittingEdit.value = false
+  }
+}
+
 const allImages = computed(() => {
   if (!book.value) return []
   const images = book.value.images.map(i => i.link)
@@ -119,7 +164,58 @@ const allImages = computed(() => {
   return images.length > 0 ? images : ['https://via.placeholder.com/600x800?text=No+Image']
 })
 
-onMounted(fetchBookData)
+let carouselInterval: number | undefined
+
+const nextImage = () => {
+  if (allImages.value.length > 1) {
+    activeImageIndex.value = (activeImageIndex.value + 1) % allImages.value.length
+  }
+}
+
+const prevImage = () => {
+  if (allImages.value.length > 1) {
+    activeImageIndex.value = (activeImageIndex.value - 1 + allImages.value.length) % allImages.value.length
+  }
+}
+
+const startCarousel = () => {
+  if (carouselInterval) return
+  carouselInterval = window.setInterval(nextImage, 2500)
+}
+
+const stopCarousel = () => {
+  if (carouselInterval) {
+    clearInterval(carouselInterval)
+    carouselInterval = undefined
+  }
+}
+
+const selectImage = (idx: number) => {
+  activeImageIndex.value = idx
+  stopCarousel()
+  startCarousel()
+}
+
+const manualNext = () => {
+  nextImage()
+  stopCarousel()
+  startCarousel()
+}
+
+const manualPrev = () => {
+  prevImage()
+  stopCarousel()
+  startCarousel()
+}
+
+onMounted(() => {
+  fetchBookData()
+  startCarousel()
+})
+
+onUnmounted(() => {
+  stopCarousel()
+})
 </script>
 
 <template>
@@ -131,8 +227,17 @@ onMounted(fetchBookData)
       <div class="grid-layout">
         <!-- Sidebar: Image Gallery -->
         <div class="image-section">
-          <div class="main-image-card glass">
+          <div 
+            class="main-image-card glass"
+            @mouseenter="stopCarousel"
+            @mouseleave="startCarousel"
+          >
+            <!-- Navigation Buttons -->
+            <button v-if="allImages.length > 1" class="img-nav-btn prev" @click.stop="manualPrev">&lt;</button>
+            
             <img :src="allImages[activeImageIndex]" :alt="book.name" class="main-img" />
+            
+            <button v-if="allImages.length > 1" class="img-nav-btn next" @click.stop="manualNext">&gt;</button>
           </div>
           <div v-if="allImages.length > 1" class="thumbnail-list">
             <div
@@ -140,7 +245,9 @@ onMounted(fetchBookData)
               :key="idx"
               class="thumb-item glass"
               :class="{ active: activeImageIndex === idx }"
-              @click="activeImageIndex = idx"
+              @click="selectImage(idx)"
+              @mouseenter="stopCarousel"
+              @mouseleave="startCarousel"
             >
               <img :src="img" alt="Thumbnail" />
             </div>
@@ -154,7 +261,7 @@ onMounted(fetchBookData)
             <p class="author">Tác giả: <span>{{ book.author }}</span></p>
 
             <div class="price-badge">
-              {{ book.price.toLocaleString('vi-VN') }} VNĐ
+              {{ (book.price * 1000).toLocaleString('vi-VN') }} VNĐ
             </div>
 
             <div class="status-tags">
@@ -181,7 +288,7 @@ onMounted(fetchBookData)
       <div id="reviews-anchor" class="reviews-wrapper animate-slide-up">
         <div class="reviews-section glass">
           <div class="review-header">
-            <h2>Đánh giá từ độc giả ({{ reviews.length }})</h2>
+            <h2>Đánh giá từ độc giả</h2>
           </div>
 
           <!-- New Review Form -->
@@ -190,7 +297,7 @@ onMounted(fetchBookData)
               <textarea
                 v-model="newReviewMessage"
                 placeholder="Chia sẻ cảm nhận của bạn về cuốn sách này..."
-                rows="2"
+                rows="1"
                 class="glass-input"
                 @keydown.enter.prevent="handleAddReview"
               ></textarea>
@@ -223,12 +330,44 @@ onMounted(fetchBookData)
                     {{ review.accountUsername }}
                     <span v-if="authStore.username === review.accountUsername" class="own-badge">Bạn</span>
                   </span>
-                  <span class="date">{{ new Date(review.createdAt).toLocaleDateString('vi-VN') }}</span>
+                  <div class="meta-right">
+                    <span class="date">{{ new Date(review.createdAt).toLocaleDateString('vi-VN') }}</span>
+                    <!-- Nút Sửa -->
+                    <button v-if="authStore.username === review.accountUsername && editingReviewId !== review.id" @click="handleEditClick(review)" class="btn-action" title="Sửa đánh giá">
+                      <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                      </svg>
+                    </button>
+                    <!-- Nút Xóa -->
+                    <button v-if="authStore.username === review.accountUsername" @click="handleDeleteReview(review.id)" class="btn-action btn-delete" title="Xóa đánh giá">
+                      <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      </svg>
+                    </button>
+                  </div>
                 </div>
-                <p class="review-text">{{ review.message }}</p>
-                <div class="review-actions" v-if="authStore.username === review.accountUsername">
-                  <button @click="handleDeleteReview(review.id)" class="btn-delete">Xóa</button>
+                
+                <div v-if="editingReviewId === review.id" class="edit-review-form">
+                  <textarea
+                    v-model="editReviewMessage"
+                    rows="2"
+                    class="glass-input edit-textarea"
+                    @keydown.enter.prevent="handleSaveEdit(review.id)"
+                  ></textarea>
+                  <div class="edit-actions">
+                    <button @click="handleSaveEdit(review.id)" :disabled="submittingEdit || !editReviewMessage.trim()" class="btn-save btn-small">
+                      <span v-if="!submittingEdit">Lưu</span>
+                      <span v-else class="loader-tiny"></span>
+                    </button>
+                    <button @click="handleCancelEdit" :disabled="submittingEdit" class="btn-cancel btn-small">Hủy</button>
+                  </div>
                 </div>
+                <p v-else class="review-text">
+                  {{ review.message }}
+                  <span v-if="review.updatedAt && review.updatedAt !== review.createdAt" class="edited-mark">(Đã chỉnh sửa)</span>
+                </p>
               </div>
             </div>
 
@@ -253,7 +392,7 @@ onMounted(fetchBookData)
 
 <style scoped>
 .book-detail-container {
-  max-width: 1200px;
+  max-width: 1300px;
   margin: 0 auto;
   padding: 2rem 1rem;
   min-height: 10vh;
@@ -265,8 +404,8 @@ onMounted(fetchBookData)
 
 .grid-layout {
   display: grid;
-  grid-template-columns: 450px 1fr;
-  gap: 2.5rem;
+  grid-template-columns: 480px 1fr;
+  gap: 3rem;
 }
 
 /* Glassmorphism background */
@@ -286,6 +425,7 @@ onMounted(fetchBookData)
 }
 
 .main-image-card {
+  position: relative;
   width: 100%;
   aspect-ratio: 3/4;
   overflow: hidden;
@@ -293,6 +433,37 @@ onMounted(fetchBookData)
   align-items: center;
   justify-content: center;
   margin-bottom: 1rem;
+}
+
+.img-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.2);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.img-nav-btn:hover {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.img-nav-btn.prev {
+  left: 10px;
+}
+
+.img-nav-btn.next {
+  right: 10px;
 }
 
 .main-img {
@@ -427,7 +598,7 @@ onMounted(fetchBookData)
 
 /* Reviews Section */
 .reviews-section {
-  padding: 2.5rem;
+  padding: 1.5rem 2rem;
 }
 
 .review-header h2 {
@@ -448,13 +619,14 @@ onMounted(fetchBookData)
   width: 100%;
   background: rgba(255, 255, 255, 0.5);
   border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
-  padding: 0.8rem 3rem 0.8rem 1rem;
+  border-radius: 20px;
+  padding: 0.6rem 3rem 0.6rem 1rem;
   resize: none;
   font-family: inherit;
   transition: all 0.3s;
-  font-size: 0.95rem;
-  min-height: 80px;
+  font-size: 0.9rem;
+  min-height: 45px;
+  line-height: 1.5;
 }
 
 .glass-input:focus {
@@ -469,8 +641,8 @@ onMounted(fetchBookData)
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  background: var(--primary);
-  color: white;
+  background: transparent;
+  color: var(--primary);
   border: none;
   width: 36px;
   height: 36px;
@@ -480,26 +652,23 @@ onMounted(fetchBookData)
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s;
-  box-shadow: 0 4px 10px rgba(var(--primary-rgb), 0.2);
 }
 
 .btn-send:hover:not(:disabled) {
   transform: translateY(-50%) scale(1.1) rotate(-10deg);
-  background: var(--primary-hover);
+  color: var(--primary-hover);
 }
 
 .btn-send:disabled {
-  background: #cbd5e1;
   color: #94a3b8;
   cursor: not-allowed;
-  box-shadow: none;
 }
 
 .loader-tiny {
   width: 18px;
   height: 18px;
-  border: 2px solid rgba(255,255,255,0.3);
-  border-top-color: white;
+  border: 2px solid rgba(0,0,0,0.1);
+  border-top-color: var(--primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -590,25 +759,97 @@ onMounted(fetchBookData)
   font-size: 0.7rem;
 }
 
-.review-actions {
-  margin-top: 0.75rem;
+.meta-right {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-action {
+  background: transparent;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  opacity: 0.6;
+}
+
+.btn-action:hover {
+  background: rgba(100, 100, 100, 0.1);
+  opacity: 1;
 }
 
 .btn-delete {
-  background: transparent;
-  border: none;
   color: #ff4757;
-  font-size: 0.85rem;
-  cursor: pointer;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  transition: background 0.2s;
 }
 
 .btn-delete:hover {
   background: rgba(255, 71, 87, 0.1);
+}
+
+.edit-review-form {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.edit-textarea {
+  min-height: 60px;
+  padding: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.btn-small {
+  padding: 0.4rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-save {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-save:hover:not(:disabled) {
+  background: var(--primary-hover, #5a67d8);
+}
+
+.btn-save:disabled {
+  background: #cbd5e1;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.btn-cancel {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.btn-cancel:hover:not(:disabled) {
+  background: #e2e8f0;
+}
+
+.edited-mark {
+  font-size: 0.65rem;
+  color: #94a3b8;
+  font-style: italic;
+  margin-left: 0.25rem;
 }
 
 .empty-reviews {
@@ -619,6 +860,9 @@ onMounted(fetchBookData)
 
 .reviews-wrapper {
   margin-top: 3rem;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
   animation: slideUp 0.6s ease-out;
 }
 

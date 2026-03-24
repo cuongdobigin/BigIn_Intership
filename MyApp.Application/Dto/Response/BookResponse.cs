@@ -13,7 +13,7 @@ public class BookResponse
     
     public bool Stock { get; set; }
     
-    
+    public int quantity { get; set; }
     public string Author { get; set; }
     public ICollection<ImageResponse> Images { get; set; } = new List<ImageResponse>();
 }

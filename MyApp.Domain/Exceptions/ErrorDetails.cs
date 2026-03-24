@@ -34,6 +34,15 @@ public static class ErrorDetails
         { ErrorCode.INCORRECT_IMAGE ,new ErrorDetail{ Code = 1022,Message = "There must be at least one photo..", HttpStatusCode = 400 } },
         { ErrorCode.IMAGE_NOT_FOUND  ,new ErrorDetail{ Code = 1023,Message = "Image not found.", HttpStatusCode = 400 } },
         {ErrorCode.REVIEW_NOT_FOUND,new ErrorDetail{ Code = 1024,Message = "Review not found.", HttpStatusCode = 400 } },
+        { ErrorCode.CART_NOT_FOUND ,new ErrorDetail{ Code = 1025,Message = "Cart not found.", HttpStatusCode = 400 } },
+        { ErrorCode.CART_ITEM_ALREADY_EXISTS ,new ErrorDetail{ Code = 1026,Message = "Cart item already exists.", HttpStatusCode = 400 } },
+        {ErrorCode.INSUFFICIENT_QUANTITY,new ErrorDetail{ Code = 1027,Message = "Insufficient quantity.", HttpStatusCode = 400 } },
+        {ErrorCode.INCORRECT_PERCENT,new ErrorDetail{ Code = 1028,Message = "Percent must be between 0 and 1 .", HttpStatusCode = 400 } },
+        { ErrorCode.MAX_VALUE ,new ErrorDetail{ Code = 1029,Message = "Max value must be greater than 0.", HttpStatusCode = 400 } },
+        { ErrorCode.MIN_VALUE ,new ErrorDetail{ Code = 1030,Message = "Min value must be greater than 0.", HttpStatusCode = 400 } },
+        { ErrorCode.END_DATE ,new ErrorDetail{Code = 1031,Message = "The end date cannot be earlier than today..", HttpStatusCode = 400 } },
+        { ErrorCode.START_DATE ,new ErrorDetail{Code=1032, Message = "Start date cannot be earlier than today..", HttpStatusCode = 400 } },
+        { ErrorCode.DISCOUNT_EXISTED ,new ErrorDetail{ Code = 1033,Message = "Discount already exists.", HttpStatusCode = 400 } },
     };
 
     public static ErrorDetail Get(ErrorCode code)

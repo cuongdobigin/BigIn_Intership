@@ -17,3 +17,4 @@ D:\.net_BigIn\MyApp.Infrastructure\obj\Debug\net9.0\refint\MyApp.Infrastructure.
 D:\.net_BigIn\MyApp.Infrastructure\obj\Debug\net9.0\MyApp.Infrastructure.pdb
 D:\.net_BigIn\MyApp.Infrastructure\obj\Debug\net9.0\MyApp.Infrastructure.genruntimeconfig.cache
 D:\.net_BigIn\MyApp.Infrastructure\obj\Debug\net9.0\ref\MyApp.Infrastructure.dll
+D:\.net_BigIn\MyApp.Infrastructure\obj\Debug\net9.0\MyApp.Infrastructure.sourcelink.json

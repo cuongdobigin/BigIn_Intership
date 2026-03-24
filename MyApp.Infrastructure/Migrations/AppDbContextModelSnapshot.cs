@@ -22,52 +22,7 @@ namespace webApi.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("AccountRole", b =>
-                {
-                    b.Property<int>("AccountsId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("RolesId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("AccountsId", "RolesId");
-
-                    b.HasIndex("RolesId");
-
-                    b.ToTable("AccountRole", (string)null);
-                });
-
-            modelBuilder.Entity("BookDetailOrder", b =>
-                {
-                    b.Property<int>("BooksId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("DetailOrderId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("BooksId", "DetailOrderId");
-
-                    b.HasIndex("DetailOrderId");
-
-                    b.ToTable("DetailOrderBook", (string)null);
-                });
-
-            modelBuilder.Entity("BookShoppingCart", b =>
-                {
-                    b.Property<int>("BooksId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ShoppingCartsId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("BooksId", "ShoppingCartsId");
-
-                    b.HasIndex("ShoppingCartsId");
-
-                    b.ToTable("BookShoppingCart", (string)null);
-                });
-
-            modelBuilder.Entity("webApi.Domain.Entity.Account", b =>
+            modelBuilder.Entity("Account", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -107,7 +62,37 @@ namespace webApi.Migrations
                     b.ToTable("Account");
                 });
 
-            modelBuilder.Entity("webApi.Domain.Entity.Book", b =>
+            modelBuilder.Entity("AccountRole", b =>
+                {
+                    b.Property<int>("AccountsId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RolesId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("AccountsId", "RolesId");
+
+                    b.HasIndex("RolesId");
+
+                    b.ToTable("AccountRole", (string)null);
+                });
+
+            modelBuilder.Entity("BookDetailOrder", b =>
+                {
+                    b.Property<int>("BooksId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("DetailOrderId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("BooksId", "DetailOrderId");
+
+                    b.HasIndex("DetailOrderId");
+
+                    b.ToTable("DetailOrderBook", (string)null);
+                });
+
+            modelBuilder.Entity("Myapp.Domain.Entity.Book", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -118,7 +103,8 @@ namespace webApi.Migrations
 
                     b.Property<string>("Author")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("author");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -142,6 +128,10 @@ namespace webApi.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("stock");
 
+                    b.Property<int>("quantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("quantity");
+
                     b.Property<int>("type_book_Id")
                         .HasColumnType("integer");
 
@@ -152,7 +142,7 @@ namespace webApi.Migrations
                     b.ToTable("Book");
                 });
 
-            modelBuilder.Entity("webApi.Domain.Entity.DetailOrder", b =>
+            modelBuilder.Entity("Myapp.Domain.Entity.DetailOrder", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -179,7 +169,7 @@ namespace webApi.Migrations
                     b.ToTable("DetailOrder");
                 });
 
-            modelBuilder.Entity("webApi.Domain.Entity.Discount", b =>
+            modelBuilder.Entity("Myapp.Domain.Entity.Discount", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -187,6 +177,10 @@ namespace webApi.Migrations
                         .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("end_date");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean")
@@ -204,12 +198,16 @@ namespace webApi.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("percent");
 
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("start_date");
+
                     b.HasKey("Id");
 
                     b.ToTable("Discount");
                 });
 
-            modelBuilder.Entity("webApi.Domain.Entity.Image", b =>
+            modelBuilder.Entity("Myapp.Domain.Entity.Image", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -233,7 +231,7 @@ namespace webApi.Migrations
                     b.ToTable("Image");
                 });
 
-            modelBuilder.Entity("webApi.Domain.Entity.Order", b =>
+            modelBuilder.Entity("Myapp.Domain.Entity.Order", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -274,7 +272,7 @@ namespace webApi.Migrations
                     b.ToTable("Order");
                 });
 
-            modelBuilder.Entity("webApi.Domain.Entity.Review", b =>
+            modelBuilder.Entity("Myapp.Domain.Entity.Review", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -315,7 +313,7 @@ namespace webApi.Migrations
                     b.ToTable("review");
                 });
 
-            modelBuilder.Entity("webApi.Domain.Entity.Role", b =>
+            modelBuilder.Entity("Myapp.Domain.Entity.Role", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -332,7 +330,7 @@ namespace webApi.Migrations
                     b.ToTable("Roles");
                 });
 
-            modelBuilder.Entity("webApi.Domain.Entity.ShoppingCart", b =>
+            modelBuilder.Entity("Myapp.Domain.Entity.ShoppingCart", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -341,22 +339,30 @@ namespace webApi.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AccountId")
-                        .HasColumnType("integer");
-
                     b.Property<int>("Amount")
                         .HasColumnType("integer")
                         .HasColumnName("amount");
 
+                    b.Property<int>("account_Id")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("book_Id")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("isActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("AccountId")
-                        .IsUnique();
+                    b.HasIndex("account_Id");
+
+                    b.HasIndex("book_Id");
 
                     b.ToTable("ShoppingCart");
                 });
 
-            modelBuilder.Entity("webApi.Domain.Entity.TypeBook", b =>
+            modelBuilder.Entity("Myapp.Domain.Entity.TypeBook", b =>
                 {
                     b.Property<int>("TypeId")
                         .ValueGeneratedOnAdd()
@@ -384,7 +390,7 @@ namespace webApi.Migrations
                     b.ToTable("TypeBook");
                 });
 
-            modelBuilder.Entity("webApi.Domain.Entity.User", b =>
+            modelBuilder.Entity("Myapp.Domain.Entity.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -417,13 +423,13 @@ namespace webApi.Migrations
 
             modelBuilder.Entity("AccountRole", b =>
                 {
-                    b.HasOne("webApi.Domain.Entity.Account", null)
+                    b.HasOne("Account", null)
                         .WithMany()
                         .HasForeignKey("AccountsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("webApi.Domain.Entity.Role", null)
+                    b.HasOne("Myapp.Domain.Entity.Role", null)
                         .WithMany()
                         .HasForeignKey("RolesId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -432,37 +438,22 @@ namespace webApi.Migrations
 
             modelBuilder.Entity("BookDetailOrder", b =>
                 {
-                    b.HasOne("webApi.Domain.Entity.Book", null)
+                    b.HasOne("Myapp.Domain.Entity.Book", null)
                         .WithMany()
                         .HasForeignKey("BooksId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("webApi.Domain.Entity.DetailOrder", null)
+                    b.HasOne("Myapp.Domain.Entity.DetailOrder", null)
                         .WithMany()
                         .HasForeignKey("DetailOrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("BookShoppingCart", b =>
+            modelBuilder.Entity("Myapp.Domain.Entity.Book", b =>
                 {
-                    b.HasOne("webApi.Domain.Entity.Book", null)
-                        .WithMany()
-                        .HasForeignKey("BooksId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("webApi.Domain.Entity.ShoppingCart", null)
-                        .WithMany()
-                        .HasForeignKey("ShoppingCartsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("webApi.Domain.Entity.Book", b =>
-                {
-                    b.HasOne("webApi.Domain.Entity.TypeBook", "TypeBook")
+                    b.HasOne("Myapp.Domain.Entity.TypeBook", "TypeBook")
                         .WithMany("Books")
                         .HasForeignKey("type_book_Id")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -471,9 +462,9 @@ namespace webApi.Migrations
                     b.Navigation("TypeBook");
                 });
 
-            modelBuilder.Entity("webApi.Domain.Entity.DetailOrder", b =>
+            modelBuilder.Entity("Myapp.Domain.Entity.DetailOrder", b =>
                 {
-                    b.HasOne("webApi.Domain.Entity.Order", "Order")
+                    b.HasOne("Myapp.Domain.Entity.Order", "Order")
                         .WithMany("DetailOrder")
                         .HasForeignKey("order_id")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -482,9 +473,9 @@ namespace webApi.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("webApi.Domain.Entity.Image", b =>
+            modelBuilder.Entity("Myapp.Domain.Entity.Image", b =>
                 {
-                    b.HasOne("webApi.Domain.Entity.Book", "Book")
+                    b.HasOne("Myapp.Domain.Entity.Book", "Book")
                         .WithMany("Images")
                         .HasForeignKey("book_Id")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -493,15 +484,15 @@ namespace webApi.Migrations
                     b.Navigation("Book");
                 });
 
-            modelBuilder.Entity("webApi.Domain.Entity.Order", b =>
+            modelBuilder.Entity("Myapp.Domain.Entity.Order", b =>
                 {
-                    b.HasOne("webApi.Domain.Entity.Account", "Account")
+                    b.HasOne("Account", "Account")
                         .WithMany("Orders")
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("webApi.Domain.Entity.Discount", "Discount")
+                    b.HasOne("Myapp.Domain.Entity.Discount", "Discount")
                         .WithMany("Orders")
                         .HasForeignKey("discount_id");
 
@@ -510,15 +501,15 @@ namespace webApi.Migrations
                     b.Navigation("Discount");
                 });
 
-            modelBuilder.Entity("webApi.Domain.Entity.Review", b =>
+            modelBuilder.Entity("Myapp.Domain.Entity.Review", b =>
                 {
-                    b.HasOne("webApi.Domain.Entity.Account", "Account")
+                    b.HasOne("Account", "Account")
                         .WithMany("Reviews")
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("webApi.Domain.Entity.Book", "Book")
+                    b.HasOne("Myapp.Domain.Entity.Book", "Book")
                         .WithMany("Reviews")
                         .HasForeignKey("book_Id")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -529,27 +520,35 @@ namespace webApi.Migrations
                     b.Navigation("Book");
                 });
 
-            modelBuilder.Entity("webApi.Domain.Entity.ShoppingCart", b =>
+            modelBuilder.Entity("Myapp.Domain.Entity.ShoppingCart", b =>
                 {
-                    b.HasOne("webApi.Domain.Entity.Account", "Account")
-                        .WithOne("ShoppingCart")
-                        .HasForeignKey("webApi.Domain.Entity.ShoppingCart", "AccountId")
+                    b.HasOne("Account", "Account")
+                        .WithMany("ShoppingCart")
+                        .HasForeignKey("account_Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Myapp.Domain.Entity.Book", "Books")
+                        .WithMany("ShoppingCarts")
+                        .HasForeignKey("book_Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Account");
+
+                    b.Navigation("Books");
                 });
 
-            modelBuilder.Entity("webApi.Domain.Entity.User", b =>
+            modelBuilder.Entity("Myapp.Domain.Entity.User", b =>
                 {
-                    b.HasOne("webApi.Domain.Entity.Account", "Account")
+                    b.HasOne("Account", "Account")
                         .WithOne("User")
-                        .HasForeignKey("webApi.Domain.Entity.User", "AccountId");
+                        .HasForeignKey("Myapp.Domain.Entity.User", "AccountId");
 
                     b.Navigation("Account");
                 });
 
-            modelBuilder.Entity("webApi.Domain.Entity.Account", b =>
+            modelBuilder.Entity("Account", b =>
                 {
                     b.Navigation("Orders");
 
@@ -560,24 +559,26 @@ namespace webApi.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("webApi.Domain.Entity.Book", b =>
+            modelBuilder.Entity("Myapp.Domain.Entity.Book", b =>
                 {
                     b.Navigation("Images");
 
                     b.Navigation("Reviews");
+
+                    b.Navigation("ShoppingCarts");
                 });
 
-            modelBuilder.Entity("webApi.Domain.Entity.Discount", b =>
+            modelBuilder.Entity("Myapp.Domain.Entity.Discount", b =>
                 {
                     b.Navigation("Orders");
                 });
 
-            modelBuilder.Entity("webApi.Domain.Entity.Order", b =>
+            modelBuilder.Entity("Myapp.Domain.Entity.Order", b =>
                 {
                     b.Navigation("DetailOrder");
                 });
 
-            modelBuilder.Entity("webApi.Domain.Entity.TypeBook", b =>
+            modelBuilder.Entity("Myapp.Domain.Entity.TypeBook", b =>
                 {
                     b.Navigation("Books");
                 });

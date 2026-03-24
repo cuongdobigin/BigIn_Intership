@@ -15,7 +15,7 @@ public class BookRequest
     public string Description { get; set; } 
     [Required]
     [Range(1, int.MaxValue, ErrorMessage = "INCORRECT_QUANTITY")]
-    public int Stock { get; set; }
+    public int quantity { get; set; }
     
     
     public string Author { get; set; }

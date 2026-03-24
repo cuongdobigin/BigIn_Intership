@@ -12,8 +12,10 @@ public class ShoppingCart
 
     [Column("amount")]
     public int Amount { get; set; }
+    [Column("is_active")]
+    public bool isActive { get; set; }=true;
     
     public Account Account { get; set; } = null!;
     
-    public ICollection<Book>  Books { get; set; } = new List<Book>();
+    public Book  Books { get; set; } = null!;
 }

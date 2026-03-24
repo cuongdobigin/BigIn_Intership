@@ -12,6 +12,7 @@ public class AccountRepository(AppDbContext context) : IAccountRepository
     {
         return await context.Accounts
             .Include(account => account.User)
+            .Include(d=>d.Roles)
             .FirstOrDefaultAsync(a => a.username == username) ;
     }
 
