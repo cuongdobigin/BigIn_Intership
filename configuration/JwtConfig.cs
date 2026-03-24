@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using webApi.Dto.Response;
+using MyApp.Application.Dto.Response;
 
 namespace webApi.configuration;
 

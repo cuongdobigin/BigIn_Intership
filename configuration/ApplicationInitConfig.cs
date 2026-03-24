@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using webApi.Domain.Entity;
+﻿
+
+using Microsoft.EntityFrameworkCore;
 using webApi.Infrastructure.Persistence;
+using Myapp.Domain.Entity;
 
 namespace webApi.configuration;
 
@@ -36,7 +38,7 @@ public class ApplicationInitConfig
                 isActive  = true,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                Roles     = new List<Role> { adminRole }
+                Roles     = new List<Role> {adminRole }
             };
 
             db.Accounts.Add(account);

@@ -1,7 +1,9 @@
-﻿using AutoMapper;
-using webApi.Domain.Entity;
-using webApi.Dto.Request;
-using webApi.Dto.Response;
+﻿
+
+using AutoMapper;
+using MyApp.Application.Dto.Request;
+using MyApp.Application.Dto.Response;
+using Myapp.Domain.Entity;
 
 namespace webApi.Mapper;
 

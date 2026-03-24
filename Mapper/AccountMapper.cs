@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
-using webApi.Domain.Entity;
-using webApi.Dto.Request;
+using MyApp.Application.Dto.Request;
 
 namespace webApi.Mapper;
 

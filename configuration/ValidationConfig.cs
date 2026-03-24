@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using webApi.Domain.Exceptions;
-using webApi.Dto.Response;
+using MyApp.Application.Dto.Response;
+using Myapp.Domain.Exceptions;
+
 
 namespace webApi.configuration;
 

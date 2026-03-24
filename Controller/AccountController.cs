@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using webApi.Domain.Entity;
-using webApi.Dto.Request;
-using webApi.Dto.Response;
-using webApi.Service.Interface;
+using MyApp.Application.Dto.Request;
+using MyApp.Application.Dto.Response;
+using MyApp.Application.Interface.Service;
+
 
 namespace webApi.Controllers;
 [Authorize]
@@ -11,25 +11,24 @@ namespace webApi.Controllers;
 [Route("api/account")]
 public class AccountController(IAccountService accountService): ControllerBase
 {
-    private readonly IAccountService _accountService= accountService;
     [AllowAnonymous]
     [HttpPost]
     public async Task<ApiResponse<string>> createAccount([FromBody]RegisterRequest registerRequest)
     {
-        await _accountService.createAccount(registerRequest);
+        await accountService.createAccount(registerRequest);
         return ApiResponse<string>.Success();
     }
     [HttpPost("change-password")]
     public async Task<ApiResponse<string>> changePassword([FromBody]ChangePasswordRequest request)
     {
-        await _accountService.changePassword(request);
+        await accountService.changePassword(request);
         return ApiResponse<string>.Success();
     }
 
     [HttpDelete("{accountId}")]
     public async Task<ApiResponse<string>> deleteAccount(int accountId)
     {
-        await _accountService.deleteAccount(accountId);
+        await accountService.deleteAccount(accountId);
         return ApiResponse<string>.Success();
     }
 }

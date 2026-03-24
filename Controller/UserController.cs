@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using webApi.Dto.Request;
-using webApi.Dto.Response;
-using webApi.Service.Interface;
+using MyApp.Application.Dto.Request;
+using MyApp.Application.Dto.Response;
+using MyApp.Application.Interface.Service;
+
 
 namespace webApi.Controller;
 
