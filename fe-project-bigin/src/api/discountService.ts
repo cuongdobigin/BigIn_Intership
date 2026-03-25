@@ -12,8 +12,7 @@ export interface DiscountResponse {
 }
 
 export const discountService = {
-  getAllDiscounts() {
-    return axiosClient.get<ApiResponse<DiscountResponse[]>>('/discounts')
-      .then(res => res.data)
+  getAllDiscounts(): Promise<ApiResponse<DiscountResponse[]>> {
+    return axiosClient.get('/api/discounts')
   }
 }

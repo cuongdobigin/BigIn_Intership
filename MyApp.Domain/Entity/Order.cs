@@ -28,6 +28,7 @@ public class Order
     public Account Account { get; set; } = null!;
     
     public Discount? Discount { get; set; }
+    public Payment? Payment { get; set; }
     public ICollection<ShoppingCart> ShoppingCarts { get; set; } = new List<ShoppingCart>();
     
 }

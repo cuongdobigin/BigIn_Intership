@@ -13,26 +13,23 @@ export interface ShoppingCartResponse {
   bookId: number;
   bookName: string;
   bookPrice: number;
+  bookImage?: string;
 }
 
 export const shoppingCartService = {
-  addToCart(request: ShoppingCartRequest) {
-    return axiosClient.post<ApiResponse<ShoppingCartResponse>>('/cart', request)
-      .then(res => res.data)
+  addToCart(request: ShoppingCartRequest): Promise<ApiResponse<ShoppingCartResponse>> {
+    return axiosClient.post('/api/cart', request)
   },
-
-  getMyCart() {
-    return axiosClient.get<ApiResponse<ShoppingCartResponse[]>>('/cart')
-      .then(res => res.data)
+ 
+  getMyCart(): Promise<ApiResponse<ShoppingCartResponse[]>> {
+    return axiosClient.get('/api/cart')
   },
-
-  updateCartItem(id: number, request: ShoppingCartRequest) {
-    return axiosClient.put<ApiResponse<ShoppingCartResponse>>(`/cart/${id}`, request)
-      .then(res => res.data)
+ 
+  updateCartItem(id: number, request: ShoppingCartRequest): Promise<ApiResponse<ShoppingCartResponse>> {
+    return axiosClient.put(`/api/cart/${id}`, request)
   },
-
-  removeFromCart(id: number) {
-    return axiosClient.delete<ApiResponse<string>>(`/cart/${id}`)
-      .then(res => res.data)
+ 
+  removeFromCart(id: number): Promise<ApiResponse<string>> {
+    return axiosClient.delete(`/api/cart/${id}`)
   }
 }

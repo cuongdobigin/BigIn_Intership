@@ -32,6 +32,7 @@ public class ShoppingCartRepository(AppDbContext context) : IShoppingCartReposit
         return await context.ShoppingCarts
             .Include(c => c.Account)
             .Include(c => c.Books)
+                .ThenInclude(b => b.Images)
             .FirstOrDefaultAsync(c => c.Id == id);
     }
 
@@ -40,6 +41,7 @@ public class ShoppingCartRepository(AppDbContext context) : IShoppingCartReposit
         return await context.ShoppingCarts
             .Include(c => c.Account)
             .Include(c => c.Books)
+                .ThenInclude(b => b.Images)
             .Where(c => c.Account.username == username && c.isActive)
             .ToListAsync();
     }

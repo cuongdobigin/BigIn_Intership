@@ -13,6 +13,7 @@ public class AppDbContext : DbContext
     public DbSet<Discount> Discounts { get; set; }
     public DbSet<Image> Images { get; set; }
     public DbSet<Order> Orders { get; set; }
+    public DbSet<Payment> Payments { get; set; }
     public DbSet<Review> Reviews { get; set; }
     public DbSet<Role> Roles { get; set; }
     public DbSet<ShoppingCart> ShoppingCarts { get; set; }
@@ -73,6 +74,10 @@ public class AppDbContext : DbContext
             entity.HasMany(o =>o.ShoppingCarts)
                   .WithOne(s => s.Order)
                   .HasForeignKey("order_id");
+            
+            entity.HasOne(o => o.Payment)
+                  .WithOne(p => p.Order)
+                  .HasForeignKey<Payment>(p => p.OrderId);
         });
 
 

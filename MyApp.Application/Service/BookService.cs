@@ -17,6 +17,7 @@ public class BookService(IMapper mapper,IBookRepository bookRepository,ITypeBook
             throw new AppException(ErrorCode.TYPE_BOOK_NOT_FOUND);
         Book book = mapper.Map<Book>(request);
         book.TypeBook=typeBook;
+        book.IsActive=true;
         await bookRepository.createBook(book);
         return mapper.Map<BookResponse>(book);
     }

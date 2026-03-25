@@ -8,7 +8,6 @@ import { useAuthStore } from '../stores/auth'
 import { useToastStore } from '../stores/toast'
 import BaseLoader from '../components/BaseLoader.vue'
 import BaseError from '../components/BaseError.vue'
-
 import BasePagination from '../components/BasePagination.vue'
 
 const route = useRoute()
@@ -49,17 +48,13 @@ const handleAddToCart = async () => {
     } else {
       toastStore.show(res.message, 'error')
     }
-  } catch (err: any) {
-    toastStore.show(err.response?.data?.message || 'Có lỗi xảy ra', 'error')
+  } catch (err: unknown) {
+    const error = err as { response?: { data?: { message?: string } } }
+    toastStore.show(error.response?.data?.message || 'Có lỗi xảy ra', 'error')
   } finally {
     addingToCart.value = false
   }
 }
-
-// Review Edit
-const editingReviewId = ref<number | null>(null)
-const editReviewMessage = ref('')
-const submittingEdit = ref(false)
 
 const fetchReviews = async (page: number) => {
   try {
@@ -121,14 +116,12 @@ const handleAddReview = async () => {
 
 const handleReviewPageChange = (page: number) => {
   fetchReviews(page)
-  // Scroll to reviews section
   const el = document.getElementById('reviews-anchor')
   if (el) el.scrollIntoView({ behavior: 'smooth' })
 }
 
 const handleDeleteReview = async (id: number) => {
   if (!confirm('Bạn có chắc chắn muốn xóa đánh giá này?')) return
-
   try {
     const res = await reviewService.deleteReview(id)
     if (res.isSuccess) {
@@ -141,19 +134,20 @@ const handleDeleteReview = async (id: number) => {
   }
 }
 
+const editingReviewId = ref<number | null>(null)
+const editReviewMessage = ref('')
+const submittingEdit = ref(false)
+
 const handleEditClick = (review: ReviewResponse) => {
   editingReviewId.value = review.id
   editReviewMessage.value = review.message
 }
-
 const handleCancelEdit = () => {
   editingReviewId.value = null
   editReviewMessage.value = ''
 }
-
 const handleSaveEdit = async (id: number) => {
   if (!editReviewMessage.value.trim()) return
-
   submittingEdit.value = true
   try {
     const res = await reviewService.updateReview(id, editReviewMessage.value)
@@ -162,12 +156,7 @@ const handleSaveEdit = async (id: number) => {
       const index = reviews.value.findIndex(r => r.id === id)
       if (index !== -1) {
         reviews.value[index].message = editReviewMessage.value
-        // Optionally update the updatedAt timestamp if the backend returns it
-        if (res.data && res.data.updatedAt) {
-          reviews.value[index].updatedAt = res.data.updatedAt
-        } else {
-          reviews.value[index].updatedAt = new Date().toISOString()
-        }
+        reviews.value[index].updatedAt = res.data?.updatedAt || new Date().toISOString()
       }
       handleCancelEdit()
     } else {
@@ -184,36 +173,30 @@ const handleSaveEdit = async (id: number) => {
 const allImages = computed(() => {
   if (!book.value) return []
   const images = book.value.images.map(i => i.link)
-  // If no specific images, can use a placeholder or avatar if exists
   return images.length > 0 ? images : ['https://via.placeholder.com/600x800?text=No+Image']
 })
 
 let carouselInterval: number | undefined
-
 const nextImage = () => {
   if (allImages.value.length > 1) {
     activeImageIndex.value = (activeImageIndex.value + 1) % allImages.value.length
   }
 }
-
 const prevImage = () => {
   if (allImages.value.length > 1) {
     activeImageIndex.value = (activeImageIndex.value - 1 + allImages.value.length) % allImages.value.length
   }
 }
-
 const startCarousel = () => {
   if (carouselInterval) return
-  carouselInterval = window.setInterval(nextImage, 2500)
+  carouselInterval = window.setInterval(nextImage, 3500)
 }
-
 const stopCarousel = () => {
   if (carouselInterval) {
     clearInterval(carouselInterval)
     carouselInterval = undefined
   }
 }
-
 const selectImage = (idx: number) => {
   activeImageIndex.value = idx
   stopCarousel()
@@ -236,10 +219,7 @@ onMounted(() => {
   fetchBookData()
   startCarousel()
 })
-
-onUnmounted(() => {
-  stopCarousel()
-})
+onUnmounted(stopCarousel)
 </script>
 
 <template>
@@ -251,17 +231,18 @@ onUnmounted(() => {
       <div class="grid-layout">
         <!-- Sidebar: Image Gallery -->
         <div class="image-section">
-          <div 
-            class="main-image-card glass"
-            @mouseenter="stopCarousel"
-            @mouseleave="startCarousel"
-          >
-            <!-- Navigation Buttons -->
-            <button v-if="allImages.length > 1" class="img-nav-btn prev" @click.stop="manualPrev">&lt;</button>
-            
+          <div class="main-image-card glass" @mouseenter="stopCarousel" @mouseleave="startCarousel">
+            <button v-if="allImages.length > 1" class="img-nav-btn prev" @click.stop="manualPrev" title="Ảnh trước">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+            </button>
             <img :src="allImages[activeImageIndex]" :alt="book.name" class="main-img" />
-            
-            <button v-if="allImages.length > 1" class="img-nav-btn next" @click.stop="manualNext">&gt;</button>
+            <button v-if="allImages.length > 1" class="img-nav-btn next" @click.stop="manualNext" title="Ảnh tiếp theo">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
           </div>
           <div v-if="allImages.length > 1" class="thumbnail-list">
             <div
@@ -270,8 +251,6 @@ onUnmounted(() => {
               class="thumb-item glass"
               :class="{ active: activeImageIndex === idx }"
               @click="selectImage(idx)"
-              @mouseenter="stopCarousel"
-              @mouseleave="startCarousel"
             >
               <img :src="img" alt="Thumbnail" />
             </div>
@@ -299,14 +278,14 @@ onUnmounted(() => {
               <p>{{ book.description || 'Chưa có mô tả cho cuốn sách này.' }}</p>
             </div>
 
-            <div class="action-buttons" style="display: flex; gap: 1rem;">
+            <div class="action-buttons">
               <div class="quantity-selector">
                 <button @click="quantity > 1 && quantity--" class="qty-btn">-</button>
-                <input type="number" v-model="quantity" min="1" class="qty-input" />
+                <input type="number" v-model.number="quantity" min="1" class="qty-input" />
                 <button @click="quantity++" class="qty-btn">+</button>
               </div>
               <button class="btn-primary ripple" :disabled="!book.stock || addingToCart" @click="handleAddToCart">
-                 <span v-if="!addingToCart">Thêm vào giỏ hàng</span>
+                 <span v-if="!addingToCart">Thêm vào giỏ</span>
                  <span v-else class="loader-tiny" style="border-top-color: white"></span>
               </button>
             </div>
@@ -314,7 +293,7 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- Reviews Section (Full Width Below) -->
+      <!-- Reviews Section -->
       <div id="reviews-anchor" class="reviews-wrapper animate-slide-up">
         <div class="reviews-section glass">
           <div class="review-header">
@@ -326,7 +305,7 @@ onUnmounted(() => {
             <div class="review-input-wrapper">
               <textarea
                 v-model="newReviewMessage"
-                placeholder="Chia sẻ cảm nhận của bạn về cuốn sách này..."
+                placeholder="Chia sẻ cảm nhận của bạn..."
                 rows="1"
                 class="glass-input"
                 @keydown.enter.prevent="handleAddReview"
@@ -335,7 +314,6 @@ onUnmounted(() => {
                 @click="handleAddReview"
                 :disabled="submittingReview || !newReviewMessage.trim()"
                 class="btn-send"
-                title="Gửi đánh giá"
               >
                 <svg v-if="!submittingReview" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
                   <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
@@ -345,7 +323,7 @@ onUnmounted(() => {
             </div>
           </div>
           <div v-else class="login-prompt glass">
-            Hãy <router-link to="/login">đăng nhập</router-link> để để lại đánh giá của bạn.
+            Hãy <router-link to="/login">đăng nhập</router-link> để để lại đánh giá.
           </div>
 
           <!-- Review List -->
@@ -362,16 +340,13 @@ onUnmounted(() => {
                   </span>
                   <div class="meta-right">
                     <span class="date">{{ new Date(review.createdAt).toLocaleDateString('vi-VN') }}</span>
-                    <!-- Nút Sửa -->
-                    <button v-if="authStore.username === review.accountUsername && editingReviewId !== review.id" @click="handleEditClick(review)" class="btn-action" title="Sửa đánh giá">
-                      <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 20h9"></path>
-                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                    <button v-if="authStore.username === review.accountUsername && editingReviewId !== review.id" @click="handleEditClick(review)" class="btn-action">
+                      <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none">
+                        <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
                       </svg>
                     </button>
-                    <!-- Nút Xóa -->
-                    <button v-if="authStore.username === review.accountUsername" @click="handleDeleteReview(review.id)" class="btn-action btn-delete" title="Xóa đánh giá">
-                      <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <button v-if="authStore.username === review.accountUsername" @click="handleDeleteReview(review.id)" class="btn-action btn-delete">
+                      <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none">
                         <polyline points="3 6 5 6 21 6"></polyline>
                         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                       </svg>
@@ -380,38 +355,21 @@ onUnmounted(() => {
                 </div>
                 
                 <div v-if="editingReviewId === review.id" class="edit-review-form">
-                  <textarea
-                    v-model="editReviewMessage"
-                    rows="2"
-                    class="glass-input edit-textarea"
-                    @keydown.enter.prevent="handleSaveEdit(review.id)"
-                  ></textarea>
+                  <textarea v-model="editReviewMessage" rows="2" class="glass-input edit-textarea"></textarea>
                   <div class="edit-actions">
-                    <button @click="handleSaveEdit(review.id)" :disabled="submittingEdit || !editReviewMessage.trim()" class="btn-save btn-small">
-                      <span v-if="!submittingEdit">Lưu</span>
-                      <span v-else class="loader-tiny"></span>
-                    </button>
-                    <button @click="handleCancelEdit" :disabled="submittingEdit" class="btn-cancel btn-small">Hủy</button>
+                    <button @click="handleSaveEdit(review.id)" :disabled="submittingEdit" class="btn-save btn-small">Lưu</button>
+                    <button @click="handleCancelEdit" class="btn-cancel btn-small">Hủy</button>
                   </div>
                 </div>
                 <p v-else class="review-text">
                   {{ review.message }}
-                  <span v-if="review.updatedAt && review.updatedAt !== review.createdAt" class="edited-mark">(Đã chỉnh sửa)</span>
+                  <span v-if="review.updatedAt && review.updatedAt !== review.createdAt" class="edited-mark">(Đã sửa)</span>
                 </p>
               </div>
             </div>
-
-            <p v-if="reviews.length === 0" class="empty-reviews">Chưa có đánh giá nào cho cuốn sách này. Hãy là người đầu tiên!</p>
-
-            <!-- Review Pagination -->
+            <p v-if="reviews.length === 0" class="empty-reviews">Chưa có đánh giá nào.</p>
             <div v-if="totalReviewPages > 1" class="review-pagination">
-              <BasePagination
-                :currentPage="reviewPage"
-                :totalPages="totalReviewPages"
-                :hasNext="hasNextReviews"
-                :hasPrevious="hasPreviousReviews"
-                @change="handleReviewPageChange"
-              />
+              <BasePagination :currentPage="reviewPage" :totalPages="totalReviewPages" :hasNext="hasNextReviews" :hasPrevious="hasPreviousReviews" @change="handleReviewPageChange" />
             </div>
           </div>
         </div>
@@ -422,10 +380,9 @@ onUnmounted(() => {
 
 <style scoped>
 .book-detail-container {
-  max-width: 1300px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1rem;
-  min-height: 10vh;
+  padding: 1rem 1rem;
 }
 
 .content-wrapper {
@@ -434,29 +391,26 @@ onUnmounted(() => {
 
 .grid-layout {
   display: grid;
-  grid-template-columns: 480px 1fr;
-  gap: 3rem;
+  grid-template-columns: 400px 1fr;
+  gap: 2.5rem;
 }
 
-/* Glassmorphism background */
+@media (max-width: 992px) {
+  .grid-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
 .glass {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
-}
-
-/* Image Section */
-.image-section {
-  position: sticky;
-  top: 2rem;
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.05);
 }
 
 .main-image-card {
   position: relative;
-  width: 100%;
   aspect-ratio: 3/4;
   overflow: hidden;
   display: flex;
@@ -469,91 +423,80 @@ onUnmounted(() => {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(0, 0, 0, 0.2);
-  color: white;
-  border: none;
-  width: 40px;
-  height: 40px;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(4px);
+  color: var(--text-dark);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  font-size: 1.5rem;
   cursor: pointer;
-  transition: all 0.3s;
   z-index: 10;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .img-nav-btn:hover {
-  background: rgba(0, 0, 0, 0.5);
+  background: white;
+  transform: translateY(-50%) scale(1.1);
+  color: var(--primary);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
 }
 
 .img-nav-btn.prev {
-  left: 10px;
+  left: 1rem;
 }
 
 .img-nav-btn.next {
-  right: 10px;
+  right: 1rem;
 }
 
 .main-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.5s ease;
-}
-
-.main-img:hover {
-  transform: scale(1.05);
+  transition: transform 0.5s;
 }
 
 .thumbnail-list {
   display: flex;
-  gap: 0.75rem;
+  gap: 0.5rem;
   overflow-x: auto;
-  padding-bottom: 0.5rem;
 }
 
 .thumb-item {
-  flex: 0 0 80px;
-  height: 80px;
+  flex: 0 0 60px;
+  height: 60px;
   cursor: pointer;
-  overflow: hidden;
-  transition: all 0.3s ease;
 }
 
 .thumb-item img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 8px;
 }
 
 .thumb-item.active {
   border-color: var(--primary);
-  box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.5);
-  transform: translateY(-4px);
 }
 
-/* Info Section */
 .info-card {
-  padding: 2.5rem;
-  height: 100%;
+  padding: 2rem;
 }
 
 .book-title {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 800;
-  background: linear-gradient(45deg, #1a1a1a, #4a4a4a);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
   margin-bottom: 0.5rem;
 }
 
 .author {
-  font-size: 1.1rem;
-  color: #666;
-  margin-bottom: 1.5rem;
+  color: #64748b;
+  margin-bottom: 1.2rem;
 }
 
 .author span {
@@ -563,201 +506,126 @@ onUnmounted(() => {
 
 .price-badge {
   display: inline-block;
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: #ff4757;
-  background: rgba(255, 71, 87, 0.1);
-  padding: 0.5rem 1.5rem;
+  background: rgba(255, 71, 87, 0.05);
+  padding: 0.4rem 1.2rem;
   border-radius: 50px;
-  margin-bottom: 1.5rem;
-}
-
-.status-tags {
-  margin-bottom: 2rem;
+  margin-bottom: 1.2rem;
 }
 
 .tag {
-  padding: 0.4rem 1rem;
+  padding: 0.3rem 0.8rem;
   border-radius: 50px;
+  font-size: 0.8rem;
   font-weight: 600;
-  font-size: 0.9rem;
 }
 
-.in-stock { background: #e3f9e5; color: #1f9d55; }
-.out-of-stock { background: #fee2e2; color: #dc2626; }
+.in-stock { background: #dcfce7; color: #166534; }
+.out-of-stock { background: #fee2e2; color: #991b1b; }
+
+.description-box {
+  margin-top: 1.5rem;
+}
 
 .description-box h3 {
-  font-size: 1.25rem;
-  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
 }
 
 .description-box p {
-  line-height: 1.8;
-  color: #555;
+  color: #475569;
+  line-height: 1.6;
 }
 
 .action-buttons {
-  margin-top: 2.5rem;
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.quantity-selector {
+  display: flex;
+  background: #f1f5f9;
+  border-radius: 10px;
+  overflow: hidden;
+  height: 42px;
+}
+
+.qty-btn {
+  width: 36px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+.qty-input {
+  width: 45px;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-weight: 700;
 }
 
 .btn-primary {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  padding: 0.6rem 1.5rem;
-  font-size: 0.95rem;
-  font-weight: 600;
+  padding: 0 1.5rem;
+  height: 42px;
   border-radius: 10px;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
-  width: auto;
-  min-width: 160px;
+  transition: all 0.3s;
 }
 
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(118, 75, 162, 0.3);
+  box-shadow: 0 4px 12px rgba(118, 75, 162, 0.2);
 }
 
-.btn-primary:active:not(:disabled) {
-  transform: translateY(0);
+/* Reviews Section Styles */
+.reviews-wrapper {
+  margin-top: 3rem;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  animation: slideUp 0.6s ease-out;
 }
 
-.quantity-selector {
-  display: flex;
-  align-items: center;
-  border: 1px solid rgba(0,0,0,0.1);
-  border-radius: 12px;
-  overflow: hidden;
-  background: white;
-  min-height: 48px;
-}
-.qty-btn {
-  background: #f8fafc;
-  border: none;
-  width: 45px;
-  height: 100%;
-  font-size: 1.5rem;
-  cursor: pointer;
-  transition: background 0.2s;
-  color: #475569;
-}
-.qty-btn:hover {
-  background: #e2e8f0;
-}
-.qty-input {
-  width: 60px;
-  text-align: center;
-  border: none;
-  font-size: 1.2rem;
-  font-weight: 600;
-  -moz-appearance: textfield;
-  appearance: textfield;
-}
-.qty-input:focus { outline: none; }
-.qty-input::-webkit-outer-spin-button,
-.qty-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.btn-primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Reviews Section */
 .reviews-section {
-  padding: 1.5rem 2rem;
-}
-
-.review-header h2 {
-  font-size: 1.5rem;
-  margin-bottom: 1.5rem;
+  padding: 1.5rem;
 }
 
 .review-form {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .review-input-wrapper {
   position: relative;
-  width: 100%;
 }
 
 .glass-input {
   width: 100%;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 20px;
-  padding: 0.6rem 3rem 0.6rem 1rem;
-  resize: none;
-  font-family: inherit;
-  transition: all 0.3s;
-  font-size: 0.9rem;
-  min-height: 45px;
-  line-height: 1.5;
-}
-
-.glass-input:focus {
-  outline: none;
+  padding: 0.8rem 3rem 0.8rem 1rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
   background: white;
-  border-color: var(--primary);
-  box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.1);
+  resize: none;
 }
 
 .btn-send {
   position: absolute;
-  right: 12px;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
+  border: none;
   background: transparent;
   color: var(--primary);
-  border: none;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   cursor: pointer;
-  transition: all 0.3s;
-}
-
-.btn-send:hover:not(:disabled) {
-  transform: translateY(-50%) scale(1.1) rotate(-10deg);
-  color: var(--primary-hover);
-}
-
-.btn-send:disabled {
-  color: #94a3b8;
-  cursor: not-allowed;
-}
-
-.loader-tiny {
-  width: 18px;
-  height: 18px;
-  border: 2px solid rgba(0,0,0,0.1);
-  border-top-color: var(--primary);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-.btn-submit:disabled { opacity: 0.5; }
-
-.login-prompt {
-  padding: 1.5rem;
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.review-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
 }
 
 .review-item {
@@ -768,29 +636,31 @@ onUnmounted(() => {
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
   transition: all 0.3s;
+  margin-bottom: 1rem;
 }
 
 .review-item:hover {
   transform: translateX(5px);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
 }
 
 .review-avatar {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: linear-gradient(45deg, var(--primary), #a78bfa);
-  color: white;
+  background: #e2e8f0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 300;
+  font-weight: 200;
   font-size: 0.6rem;
   flex-shrink: 0;
 }
 
 .review-content {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* Prevents overflow */
 }
 
 .review-meta {
@@ -798,6 +668,13 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.25rem;
+  width: 100%;
+}
+
+.meta-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .user-name {
@@ -807,6 +684,7 @@ onUnmounted(() => {
   align-items: center;
   gap: 0.5rem;
   font-size: 0.6rem;
+  flex-grow: 1;
 }
 
 .own-badge {
@@ -827,12 +705,6 @@ onUnmounted(() => {
   color: #555;
   line-height: 1;
   font-size: 0.7rem;
-}
-
-.meta-right {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
 }
 
 .btn-action {
@@ -858,82 +730,13 @@ onUnmounted(() => {
   color: #ff4757;
 }
 
-.btn-delete:hover {
-  background: rgba(255, 71, 87, 0.1);
-}
-
-.edit-review-form {
-  margin-top: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.edit-textarea {
-  min-height: 60px;
-  padding: 0.5rem;
-  font-size: 0.85rem;
-}
-
-.edit-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-}
-
-.btn-small {
-  padding: 0.4rem 1rem;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-save {
-  background: var(--primary);
-  color: white;
-}
-
-.btn-save:hover:not(:disabled) {
-  background: var(--primary-hover, #5a67d8);
-}
-
-.btn-save:disabled {
-  background: #cbd5e1;
-  color: #94a3b8;
-  cursor: not-allowed;
-}
-
-.btn-cancel {
-  background: #f1f5f9;
-  color: #64748b;
-}
-
-.btn-cancel:hover:not(:disabled) {
-  background: #e2e8f0;
-}
-
-.edited-mark {
-  font-size: 0.65rem;
-  color: #94a3b8;
-  font-style: italic;
-  margin-left: 0.25rem;
-}
-
-.empty-reviews {
-  text-align: center;
-  color: #999;
-  padding: 2rem;
-}
-
-.reviews-wrapper {
-  margin-top: 3rem;
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
-  animation: slideUp 0.6s ease-out;
+.loader-tiny {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0,0,0,0.1);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
 }
 
 .review-pagination {
@@ -942,29 +745,10 @@ onUnmounted(() => {
   justify-content: center;
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.animate-fade-in { animation: fadeIn 0.8s ease-out; }
-
-.animate-slide-up {
-  animation: slideUp 0.5s ease-out forwards;
-}
-
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp {
   from { transform: translateY(20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
-}
-
-@media (max-width: 992px) {
-  .grid-layout {
-    grid-template-columns: 1fr;
-  }
-  .image-section {
-    position: static;
-  }
 }
 </style>

@@ -19,18 +19,15 @@ export interface OrderResponse {
 }
 
 export const orderService = {
-  createOrder(request: OrderRequest) {
-    return axiosClient.post<ApiResponse<OrderResponse>>('/orders', request)
-      .then(res => res.data)
+  createOrder(request: OrderRequest): Promise<ApiResponse<OrderResponse>> {
+    return axiosClient.post('/api/orders', request)
   },
 
-  getMyOrders() {
-    return axiosClient.get<ApiResponse<OrderResponse[]>>('/orders')
-      .then(res => res.data)
+  getMyOrders(): Promise<ApiResponse<OrderResponse[]>> {
+    return axiosClient.get('/api/orders')
   },
 
-  getOrderById(id: number) {
-    return axiosClient.get<ApiResponse<OrderResponse>>(`/orders/${id}`)
-      .then(res => res.data)
+  getOrderById(id: number): Promise<ApiResponse<OrderResponse>> {
+    return axiosClient.get(`/api/orders/${id}`)
   }
 }
