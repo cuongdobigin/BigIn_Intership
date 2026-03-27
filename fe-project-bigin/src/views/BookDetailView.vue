@@ -155,8 +155,11 @@ const handleSaveEdit = async (id: number) => {
       toastStore.show('Đã cập nhật đánh giá!', 'success')
       const index = reviews.value.findIndex(r => r.id === id)
       if (index !== -1) {
-        reviews.value[index].message = editReviewMessage.value
-        reviews.value[index].updatedAt = res.data?.updatedAt || new Date().toISOString()
+        const review = reviews.value[index]
+        if (review) {
+          review.message = editReviewMessage.value
+          review.updatedAt = res.data?.updatedAt || new Date().toISOString()
+        }
       }
       handleCancelEdit()
     } else {
@@ -270,6 +273,7 @@ onUnmounted(stopCarousel)
             <div class="status-tags">
               <span :class="['tag', book.stock ? 'in-stock' : 'out-of-stock']">
                 {{ book.stock ? 'Còn hàng' : 'Hết hàng' }}
+                <span v-if="book.stock" class="qty-badge">({{ book.quantity }} sản phẩm)</span>
               </span>
             </div>
 
@@ -525,6 +529,13 @@ onUnmounted(stopCarousel)
 .in-stock { background: #dcfce7; color: #166534; }
 .out-of-stock { background: #fee2e2; color: #991b1b; }
 
+.qty-badge {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  margin-left: 0.2rem;
+  font-weight: 500;
+}
+
 .description-box {
   margin-top: 1.5rem;
 }
@@ -743,6 +754,53 @@ onUnmounted(stopCarousel)
   margin-top: 2rem;
   display: flex;
   justify-content: center;
+}
+
+.edit-review-form {
+  margin-top: 0.5rem;
+  width: 100%;
+}
+
+.edit-textarea {
+  font-size: 0.75rem !important;
+  margin-bottom: 0.5rem;
+  min-height: 60px;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.btn-small {
+  padding: 0.3rem 0.8rem;
+  font-size: 0.7rem;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn-save {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-save:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.btn-cancel {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+.btn-cancel:hover {
+  background: #e2e8f0;
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }

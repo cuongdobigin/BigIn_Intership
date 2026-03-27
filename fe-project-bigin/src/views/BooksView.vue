@@ -45,80 +45,100 @@ const fetchBooks = async () => {
       errorMsg.value = response.message || 'Lấy danh sách sách thất bại.'
     }
   } catch (err: unknown) {
-    const error = err as { response?: { data?: { message?: string } } }
-    errorMsg.value = error?.response?.data?.message || 'Có lỗi xảy ra khi kết nối đến máy chủ.'
+    if (err instanceof Error) {
+      errorMsg.value = err.message
+    } else {
+      errorMsg.value = 'Có lỗi xảy ra khi kết nối máy chủ.'
+    }
   } finally {
     loading.value = false
   }
 }
 
-const changePage = (page: number) => {
-  router.push({
-    query: { ...route.query, page: page.toString() }
-  })
-}
-
-onMounted(() => fetchBooks())
-watch(() => route.query, () => {
-  currentPage.value = Number(route.query.page) || 1
+watch(() => route.query.typeId, () => {
+  currentPage.value = 1
   fetchBooks()
-}, { deep: true })
+})
+
+watch(() => route.query.page, (newVal) => {
+  currentPage.value = Number(newVal) || 1
+  fetchBooks()
+})
+
+onMounted(() => {
+  fetchBooks()
+})
+
+const handlePageChange = (page: number) => {
+  router.push({
+    query: {
+      ...route.query,
+      page
+    }
+  })
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
 </script>
 
 <template>
   <div class="books-view">
     <AppSectionHeader :title="pageTitle" />
 
-    <BaseLoader v-if="loading" />
-
-    <BaseError v-else-if="errorMsg" :message="errorMsg" />
+    <BaseError v-if="errorMsg" :message="errorMsg" @retry="fetchBooks" />
 
     <template v-else>
-      <div v-if="books.length > 0" class="book-grid">
+      <div v-if="loading" class="loader-container">
+        <BaseLoader message="Đang tải danh sách sách..." />
+      </div>
+
+      <div v-else-if="books.length === 0" class="no-results">
+        <p>Không có sách nào trong chuyên mục này.</p>
+      </div>
+
+      <div v-else class="books-grid">
         <BookCard v-for="book in books" :key="book.id" :book="book" />
       </div>
 
-      <div v-else class="no-books">
-        Không tìm thấy cuốn sách nào.
+      <div class="pagination-container" v-if="totalPages > 1">
+        <BasePagination 
+          :current-page="currentPage" 
+          :total-pages="totalPages"
+          @change="handlePageChange"
+        />
       </div>
-
-      <BasePagination 
-        :currentPage="currentPage"
-        :totalPages="totalPages"
-        :hasNext="hasNext"
-        :hasPrevious="hasPrevious"
-        @change="changePage"
-      />
     </template>
   </div>
 </template>
 
 <style scoped>
 .books-view {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  padding-bottom: 3rem;
+  width: 100%;
 }
 
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 2px solid var(--primary);
-  padding-bottom: 0.5rem;
-}
-
-.book-grid {
+.books-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 2rem;
+  margin-bottom: 3rem;
 }
 
-.no-books {
-  text-align: center;
-  padding: 4rem;
-  color: var(--text-muted);
-  font-size: 1.125rem;
+.loader-container, .no-results {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+@media (max-width: 640px) {
+  .books-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 }
 </style>

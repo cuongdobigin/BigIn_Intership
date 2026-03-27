@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Application.Dto.Request;
 using MyApp.Application.Dto.Response;
@@ -31,6 +31,13 @@ public class BookController(IBookService bookService) : ControllerBase
     public async Task<ApiResponse<PageResponse<BookResponse>>> GetAllBook_TypeBook([FromQuery] PageRequest request,int id)
     {
         var result = await bookService.GetAllBook_TypeBook(id,request);
+        return ApiResponse<PageResponse<BookResponse>>.Success(result);
+    }
+    [HttpGet("type-books/admin/{id}")]
+    [Authorize(Roles = "admin")]
+    public async Task<ApiResponse<PageResponse<BookResponse>>> GetAllBook_TypeBook_admin([FromQuery] PageRequest request,int id)
+    {
+        var result = await bookService.getAllBooks_TypeBook_admin(id,request);
         return ApiResponse<PageResponse<BookResponse>>.Success(result);
     }
     [HttpGet("{id}")]

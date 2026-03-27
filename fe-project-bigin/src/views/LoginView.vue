@@ -29,12 +29,15 @@ const handleLogin = async () => {
       auth.setUser(email.value, loginData.token)
     }
 
-    if (loginData?.isFirstTime) {
+    if (auth.isAdmin) {
+      toast.show('Đăng nhập Quản trị thành công!', 'success')
+      router.push('/admin')
+    } else if (loginData?.isFirstTime) {
       toast.show('Đăng nhập thành công! Vui lòng hoàn thiện thông tin hồ sơ.', 'success')
       router.push('/profile-setup')
     } else {
       toast.show('Đăng nhập thành công!', 'success')
-      router.push('/') // Chuyển hướng về trang chủ
+      router.push('/')
     }
   } catch (err: any) {
     error.value = err?.response?.data?.message || err?.response?.data?.Message || 'Email hoặc mật khẩu không chính xác.'

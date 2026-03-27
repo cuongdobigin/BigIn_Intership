@@ -1,4 +1,4 @@
-﻿using MyApp.Application.Dto.Request;
+using MyApp.Application.Dto.Request;
 using MyApp.Application.Dto.Response;
 
 namespace MyApp.Application.Interface.Service;
@@ -9,4 +9,5 @@ public interface IBookService
     Task<BookResponse> UpdateBook(BookRequest request,int bookId);
     Task<BookResponse> CreateBook(BookRequest request);
     Task<PageResponse<BookResponse>> GetAllBook_TypeBook(int typeId,PageRequest pageRequest);
+    Task<PageResponse<BookResponse>> getAllBooks_TypeBook_admin(int typeId,PageRequest pageRequest);
 }

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using MyApp.Application.Dto.Request;
 using MyApp.Application.Dto.Response;
 using MyApp.Application.Interface.Repository;
@@ -24,6 +24,10 @@ public class TypeBookService(ITypeBookRepository typeBookRepository,IMapper mapp
     public async Task<List<TypeBookResponse>> findAllTypeBooks()
     {
          return mapper.Map<List<TypeBookResponse>>(await typeBookRepository.findAllTypeBooks());
+    }
+    public async Task<List<TypeBookResponse>> findAllTypeBooks_Admin()
+    {
+        return mapper.Map<List<TypeBookResponse>>(await typeBookRepository.findAllTypeBooks_Admin());
     }
 
     public async Task<TypeBookResponse?> findTypeBookById(int id)

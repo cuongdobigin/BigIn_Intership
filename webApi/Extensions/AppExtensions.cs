@@ -1,4 +1,4 @@
-﻿using webApi.Infrastructure.Middleware;
+using webApi.Infrastructure.Middleware;
 
 namespace webApi.Extensions;
 
@@ -8,7 +8,7 @@ public static class AppExtensions
     {
         app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-        app.UseHttpsRedirection();
+        // app.UseHttpsRedirection(); // Disable for local dev to avoid CORS/Redirect issues with HTTP frontend
 
         if (app.Environment.IsDevelopment())
         {
