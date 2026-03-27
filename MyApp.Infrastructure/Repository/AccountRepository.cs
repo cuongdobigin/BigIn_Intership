@@ -34,5 +34,15 @@ public class AccountRepository(AppDbContext context) : IAccountRepository
         return await context.Accounts.FindAsync(accountId);
         
     }
-    
+
+    public async Task<(List<Account>,int)> findAll(int page, int pageSize, string? search = null)
+    {
+        IQueryable<Account> query= context.Accounts.Include(a => a.User);
+        if (!string.IsNullOrEmpty(search))
+        {
+            query = query.Where(b => b.username.Contains(search));
+        }
+        int totalItems = await query.CountAsync();
+        return (await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync(), totalItems);
+    }
 }

@@ -1,4 +1,4 @@
-﻿namespace MyApp.Application.Dto.Request;
+namespace MyApp.Application.Dto.Request;
 
 public class PageRequest
 {
@@ -16,4 +16,5 @@ public class PageRequest
         get => _pageSize;
         set => _pageSize = value < 1 ? 10 : value > 100 ? 100 : value;
     }
+    public string? Search { get; set; }
 }

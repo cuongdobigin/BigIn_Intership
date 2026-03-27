@@ -31,4 +31,20 @@ public class AccountController(IAccountService accountService): ControllerBase
         await accountService.deleteAccount(accountId);
         return ApiResponse<string>.Success();
     }
+
+    [HttpGet]
+    [Authorize(Roles = "admin")]
+    public async Task<ApiResponse<PageResponse<AccountResponse>>> GetAllBooks([FromQuery] PageRequest request)
+    {
+
+        return ApiResponse<PageResponse<AccountResponse>>.Success(await accountService.getAll(request));
+    }
+
+    [HttpPut("{accountId}")]
+    [Authorize(Roles = "admin")]
+    public async Task<ApiResponse<string>> UpdateAccount(int accountId, [FromBody]updateAcount updateAcount)
+    {
+        await accountService.UpdateAccount(accountId, updateAcount);
+        return ApiResponse<string>.Success();
+    }
 }

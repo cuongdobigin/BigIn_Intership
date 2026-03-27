@@ -22,6 +22,11 @@ public class TypeBookRepository(AppDbContext appDbContext):ITypeBookRepository
             .Where(a=> a.IsActive==true)
             .ToListAsync();
     }
+    public async Task<List<TypeBook>> findAllTypeBooks_Admin()
+    {
+        return await appDbContext.TypeBooks
+            .ToListAsync();
+    }
 
     public async Task<TypeBook?> findTypeBookById(int id)
     {

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using MyApp.Application.Dto.Request;
 using MyApp.Application.Dto.Response;
 using MyApp.Application.Interface.Repository;
@@ -17,7 +17,7 @@ public class BookService(IMapper mapper,IBookRepository bookRepository,ITypeBook
             throw new AppException(ErrorCode.TYPE_BOOK_NOT_FOUND);
         Book book = mapper.Map<Book>(request);
         book.TypeBook=typeBook;
-        book.IsActive=true;
+        book.Stock=true;
         await bookRepository.createBook(book);
         return mapper.Map<BookResponse>(book);
     }
@@ -25,7 +25,7 @@ public class BookService(IMapper mapper,IBookRepository bookRepository,ITypeBook
     public async Task<PageResponse<BookResponse>> GetAllBook(PageRequest pageRequest)
     {
         var (books, totalItems) =
-            await bookRepository.getAllBooks( pageRequest.Page, pageRequest.PageSize);
+            await bookRepository.getAllBooks( pageRequest.Page, pageRequest.PageSize, pageRequest.Search);
         return new PageResponse<BookResponse>
         {
             Data = mapper.Map<List<BookResponse>>(books),
@@ -46,6 +46,16 @@ public class BookService(IMapper mapper,IBookRepository bookRepository,ITypeBook
     public async Task<BookResponse> UpdateBook(BookRequest request,int bookId)
     {
         Book book=await bookRepository.findById(bookId)??throw new AppException(ErrorCode.BOOK_NOT_FOUND);
+        
+        // Cập nhật quan hệ TypeBook nếu có thay đổi
+        if (book.type_book_Id != request.TypeBookId)
+        {
+            TypeBook typeBook = await typeBookRepository.findTypeBookById(request.TypeBookId) ?? 
+                throw new AppException(ErrorCode.TYPE_BOOK_NOT_FOUND);
+            book.TypeBook = typeBook;
+            book.type_book_Id = request.TypeBookId;
+        }
+
         mapper.Map(request, book);
         await bookRepository.updateBook(book);
         return mapper.Map<BookResponse>(book);
@@ -54,7 +64,7 @@ public class BookService(IMapper mapper,IBookRepository bookRepository,ITypeBook
     public async Task<PageResponse<BookResponse>> GetAllBook_TypeBook(int typeId,PageRequest pageRequest)
     {
         var (books, totalItems) =
-            await bookRepository.getAllBooks_TypeBook(typeId, pageRequest.Page, pageRequest.PageSize);
+            await bookRepository.getAllBooks_TypeBook(typeId, pageRequest.Page, pageRequest.PageSize, pageRequest.Search);
         return new PageResponse<BookResponse>
         {
             Data = mapper.Map<List<BookResponse>>(books),
@@ -64,4 +74,18 @@ public class BookService(IMapper mapper,IBookRepository bookRepository,ITypeBook
             TotalPages = (int)Math.Ceiling((double)totalItems / pageRequest.PageSize)
         };
     }
+    public async Task<PageResponse<BookResponse>> getAllBooks_TypeBook_admin(int typeId,PageRequest pageRequest)
+    {
+        var (books, totalItems) =
+            await bookRepository.getAllBooks_TypeBook_admin(typeId, pageRequest.Page, pageRequest.PageSize, pageRequest.Search);
+        return new PageResponse<BookResponse>
+        {
+            Data = mapper.Map<List<BookResponse>>(books),
+            Page = pageRequest.Page,
+            PageSize = pageRequest.PageSize,
+            TotalItems = totalItems,
+            TotalPages = (int)Math.Ceiling((double)totalItems / pageRequest.PageSize)
+        };
+    }
+    
 }

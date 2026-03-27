@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Application.Dto.Request;
 using MyApp.Application.Dto.Response;
@@ -15,6 +15,12 @@ public class TypeBookController(ITypeBookService typeBookService) : ControllerBa
     public async Task<ApiResponse<List<TypeBookResponse>>> FindAll()
     {
         return ApiResponse<List<TypeBookResponse>>.Success(await typeBookService.findAllTypeBooks());
+    }
+    [HttpGet("/admin")]
+    [Authorize(Roles = "admin")]
+    public async Task<ApiResponse<List<TypeBookResponse>>> FindAll_Admin()
+    {
+        return ApiResponse<List<TypeBookResponse>>.Success(await typeBookService.findAllTypeBooks_Admin());
     }
 
     [HttpGet("{id}")]

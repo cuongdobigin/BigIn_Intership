@@ -9,6 +9,7 @@ public static class ConfigExtensions
     {
         services.Configure<JwtOptionConfig>(config.GetSection("Jwt"));
         services.Configure<MoMoOptionConfig>(config.GetSection("momo"));
+        services.Configure<OpenAiConfig>(config.GetSection("openAI"));
         
         
         services.AddJwtAuthentication(config);

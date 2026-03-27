@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Net.Mime;
 
@@ -31,6 +31,9 @@ public class Book
     public int quantity {get; set;} = 0;
     
     [Column("is_active")] public bool IsActive { get; set; } = true;
+    
+    [Column("type_book_Id")]
+    public int type_book_Id { get; set; }
     public TypeBook TypeBook { get; set; } = null!;
 
     public ICollection<Image> Images { get; set; } = new List<Image>();

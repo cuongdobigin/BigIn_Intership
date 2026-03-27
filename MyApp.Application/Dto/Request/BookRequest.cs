@@ -1,4 +1,4 @@
-﻿
+
 using System.ComponentModel.DataAnnotations;
 
 namespace MyApp.Application.Dto.Request;
@@ -21,4 +21,5 @@ public class BookRequest
     public string Author { get; set; }
     
     public int TypeBookId { get; set; }
+    public bool isActive { get; set; }
 }

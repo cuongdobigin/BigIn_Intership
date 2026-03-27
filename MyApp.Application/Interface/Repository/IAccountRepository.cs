@@ -7,4 +7,5 @@ public interface IAccountRepository
     Task<Account> AddAsync(Account account);
     Task UpdateAsync(Account account);
     Task<Account> findById(int accountId);
+    Task<(List<Account>,int)> findAll(int page,int pageSize, string? search = null);
 }

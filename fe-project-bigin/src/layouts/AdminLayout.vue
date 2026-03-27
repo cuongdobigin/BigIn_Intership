@@ -1,21 +1,18 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import TheHeader from '../components/layout/TheHeader.vue'
-import TheSidebar from '../components/layout/TheSidebar.vue'
+import TheAdminHeader from '../components/layout/TheAdminHeader.vue'
+import TheAdminSidebar from '../components/layout/TheAdminSidebar.vue'
 import TheFooter from '../components/layout/TheFooter.vue'
 import AISupport from '../components/chat/AISupport.vue'
 </script>
 
 <template>
-  <div class="main-layout-wrapper">
-    <!-- Header đã được tách ra component riêng -->
-    <TheHeader />
+  <div class="admin-layout-wrapper">
+    <TheAdminHeader />
 
     <div class="content-wrapper">
-      <!-- Sidebar đã được tách ra component riêng -->
-      <TheSidebar />
+      <TheAdminSidebar />
 
-      <!-- Main Content Area -->
       <main class="main-content">
         <RouterView />
       </main>
@@ -24,38 +21,37 @@ import AISupport from '../components/chat/AISupport.vue'
     <!-- AI Support Chatbox -->
     <AISupport />
 
-    <!-- Footer đã được tách ra component riêng -->
     <TheFooter />
   </div>
 </template>
 
 <style scoped>
-/* Layout Architecture */
-.main-layout-wrapper {
+.admin-layout-wrapper {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   background-color: var(--bg-body);
 }
 
-/* Content Area */
 .content-wrapper {
   flex: 1;
   display: flex;
   max-width: 1280px;
   width: 100%;
-  margin: 70px auto 0; /* Clear fixed header */
+  margin: 70px auto 0;
   padding: 2rem;
   gap: 2rem;
 }
 
-/* Main Content */
 .main-content {
   flex: 1;
   min-width: 0;
+  background: white;
+  padding: 2rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
 }
 
-/* Responsive adjustments if needed */
 @media (max-width: 768px) {
   .content-wrapper {
     flex-direction: column;
